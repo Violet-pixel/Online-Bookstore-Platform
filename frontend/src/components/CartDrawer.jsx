@@ -1,0 +1,40 @@
+import { ArrowRight, Truck } from 'lucide-react';
+import { useNavigate } from 'react-router';
+import { useCart } from '../lib/cart.jsx';
+import { money } from '../lib/format.js';
+import { Empty } from './Bits.jsx';
+import CartLines from './CartLines.jsx';
+import { Drawer } from './Overlay.jsx';
+
+const FREE = 199;
+
+export default function CartDrawer() {
+  const { cart, open, setOpen } = useCart();
+  const navigate = useNavigate();
+  const missing = Math.max(0, FREE - Number(cart.subtotal));
+  const pct = Math.min(100, (Number(cart.subtotal) / FREE) * 100);
+  return (
+    <Drawer open={open} onClose={() => setOpen(false)} title={`Carrinho${cart.itemCount ? ` · ${cart.itemCount}` : ''}`}
+      footer={cart.itemCount ? (close) => (
+        <>
+          <div className="stack" style={{ gap: 8 }}>
+            <div className="row" style={{ gap: 8, fontSize: 13 }}>
+              <Truck size={16} />
+              {missing > 0 ? <span>Faltam <b>{money(missing)}</b> para o frete grátis na entrega econômica</span> : <b>Você ganhou frete grátis na entrega econômica</b>}
+            </div>
+            <div className="step done" style={{ gap: 0 }}><div className="bar"><i style={{ width: `${pct}%`, background: pct >= 100 ? 'var(--success)' : undefined }} /></div></div>
+          </div>
+          <div className="sum-row total"><span>Subtotal</span><span>{money(cart.subtotal)}</span></div>
+          <button type="button" className="btn btn-primary btn-lg btn-block" onClick={() => { close(); navigate('/carrinho'); }}>
+            Fechar pedido <ArrowRight size={18} />
+          </button>
+        </>
+      ) : null}>
+      {(close) => (cart.itemCount ? <CartLines compact onNavigate={close} /> : (
+        <Empty title="Seu carrinho está vazio" action={<button type="button" className="btn btn-dark" onClick={() => { close(); navigate('/livros'); }}>Explorar livros</button>}>
+          Que tal começar pelos mais vendidos?
+        </Empty>
+      ))}
+    </Drawer>
+  );
+}

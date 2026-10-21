@@ -1,0 +1,102 @@
+/* Paleta Prelo: #212121 · #EAEAEA · #B86B84 · #E0B94F · #DADADA · #FFDF7F (e tons derivados) */
+:root {
+  --ink: #212121;
+  --mist: #EAEAEA;
+  --rose: #B86B84;
+  --gold: #E0B94F;
+  --stone: #DADADA;
+  --butter: #FFDF7F;
+
+  --bg: #F5F4F1;
+  --bg-soft: #EFEDE8;
+  --surface: #FFFFFF;
+  --surface-2: #F8F7F4;
+  --line: #DADADA;
+  --line-soft: #E8E6E1;
+  --text: #212121;
+  --text-2: #55534F;
+  --text-3: #8A8782;
+  --accent: #B86B84;
+  --accent-strong: #9E5570;
+  --accent-soft: #F4E4EA;
+  --accent-ink: #FFFFFF;
+  --gold-soft: #FBF1D2;
+  --butter-soft: #FFF6D6;
+  --success: #3E8E6A;
+  --success-soft: #E3F1EA;
+  --danger: #B5483F;
+  --danger-soft: #F7E3E1;
+  --shadow-sm: 0 1px 2px rgba(33, 33, 33, .06), 0 1px 1px rgba(33, 33, 33, .04);
+  --shadow: 0 10px 30px -12px rgba(33, 33, 33, .22), 0 2px 6px rgba(33, 33, 33, .05);
+  --shadow-lg: 0 30px 60px -20px rgba(33, 33, 33, .35);
+  --overlay: rgba(23, 23, 23, .42);
+
+  --font-serif: 'Fraunces Variable', 'Fraunces', Georgia, serif;
+  --font-sans: 'Manrope Variable', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 24px;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --fast: 160ms;
+  --med: 280ms;
+  --slow: 520ms;
+  --page: 1240px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #171717;
+    --bg-soft: #1C1C1C;
+    --surface: #212121;
+    --surface-2: #262626;
+    --line: #383838;
+    --line-soft: #2E2E2E;
+    --text: #EAEAEA;
+    --text-2: #BDBBB7;
+    --text-3: #8E8C88;
+    --accent: #CC8AA0;
+    --accent-strong: #DDA3B6;
+    --accent-soft: #3A2A30;
+    --accent-ink: #212121;
+    --gold-soft: #3A3322;
+    --butter-soft: #35301F;
+    --success: #6BC39A;
+    --success-soft: #1F3329;
+    --danger: #E58A80;
+    --danger-soft: #3A2421;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
+    --shadow: 0 14px 34px -14px rgba(0, 0, 0, .7);
+    --shadow-lg: 0 30px 60px -20px rgba(0, 0, 0, .8);
+    --overlay: rgba(0, 0, 0, .6);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #171717;
+  --bg-soft: #1C1C1C;
+  --surface: #212121;
+  --surface-2: #262626;
+  --line: #383838;
+  --line-soft: #2E2E2E;
+  --text: #EAEAEA;
+  --text-2: #BDBBB7;
+  --text-3: #8E8C88;
+  --accent: #CC8AA0;
+  --accent-strong: #DDA3B6;
+  --accent-soft: #3A2A30;
+  --accent-ink: #212121;
+  --gold-soft: #3A3322;
+  --butter-soft: #35301F;
+  --success: #6BC39A;
+  --success-soft: #1F3329;
+  --danger: #E58A80;
+  --danger-soft: #3A2421;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
+  --shadow: 0 14px 34px -14px rgba(0, 0, 0, .7);
+  --shadow-lg: 0 30px 60px -20px rgba(0, 0, 0, .8);
+  --overlay: rgba(0, 0, 0, .6);
+  color-scheme: dark;
+}

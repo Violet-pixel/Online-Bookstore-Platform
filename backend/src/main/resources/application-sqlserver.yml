@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:sqlserver://${DB_HOST:localhost}:${DB_PORT:1433};databaseName=${DB_NAME:prelo};encrypt=true;trustServerCertificate=${DB_TRUST_CERT:true}}
+  jpa:
+    properties:
+      hibernate:
+        use_nationalized_character_data: true

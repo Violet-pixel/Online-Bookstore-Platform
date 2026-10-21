@@ -1,0 +1,99 @@
+# Prelo · configuração da API
+# O banco é escolhido por DB_VENDOR (postgresql, mysql, sqlserver ou oracle): cada um tem o seu
+# application-<banco>.yml e a sua pasta de migrações em db/migration/<banco>.
+spring:
+  application:
+    name: bookstore-api
+  profiles:
+    active: ${DB_VENDOR:postgresql}
+  datasource:
+    username: ${DB_USER:prelo}
+    password: ${DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      connection-timeout: 10000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+        default_batch_fetch_size: 50
+  flyway:
+    locations: classpath:db/migration/{vendor}
+    baseline-on-migrate: false
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+      timeout: 3s
+  cache:
+    type: redis
+    redis:
+      time-to-live: 10m
+      key-prefix: "livraria:cache:"
+  threads:
+    virtual:
+      enabled: true
+
+server:
+  port: ${SERVER_PORT:8081}
+  forward-headers-strategy: framework
+  shutdown: graceful
+  error:
+    include-message: never
+    include-stacktrace: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+
+springdoc:
+  api-docs:
+    enabled: ${API_DOCS_ENABLED:true}
+    path: /api/openapi
+  swagger-ui:
+    enabled: ${API_DOCS_ENABLED:true}
+    path: /api/docs
+    operations-sorter: alpha
+    tags-sorter: alpha
+
+app:
+  name: Prelo
+  https: ${APP_HTTPS:false}
+  cors-origins: ${APP_CORS_ORIGINS:http://localhost:5173,http://localhost:8080}
+  jwt:
+    secret: ${JWT_SECRET:}
+    access-ttl: ${JWT_ACCESS_TTL:15m}
+    refresh-ttl: ${JWT_REFRESH_TTL:7d}
+  demo:
+    enabled: ${APP_SEED_DEMO:true}
+    domain: prelo.dev
+    password: Prelo@2026
+  payments:
+    sandbox: ${PAYMENTS_SANDBOX:true}
+    order-hold: ${PAYMENTS_ORDER_HOLD:60m}
+    pix-ttl: ${PAYMENTS_PIX_TTL:30m}
+    boleto-days: 3
+    max-installments: 6
+    min-installment-value: 30.00
+  jobs:
+    enabled: ${APP_JOBS_ENABLED:true}
+
+logging:
+  level:
+    org.hibernate.orm.deprecation: error

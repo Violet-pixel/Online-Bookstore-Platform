@@ -1,0 +1,160 @@
+# Prelo · Docker Compose
+# O banco é escolhido no .env (DB_VENDOR e COMPOSE_PROFILES): postgresql, mysql, sqlserver ou oracle.
+# Só o banco escolhido sobe; os quatro respondem pelo mesmo nome de rede (db).
+name: prelo
+
+services:
+  postgresql:
+    image: postgres:16-alpine
+    profiles: [postgresql]
+    environment:
+      POSTGRES_DB: ${DB_NAME:-prelo}
+      POSTGRES_USER: ${DB_USER:-prelo}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no .env}
+    volumes: [pg-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      default:
+        aliases: [db]
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.4
+    profiles: [mysql]
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_0900_ai_ci"]
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-prelo}
+      MYSQL_USER: ${DB_USER:-prelo}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no .env}
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    volumes: [mysql-data:/var/lib/mysql]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks:
+      default:
+        aliases: [db]
+    restart: unless-stopped
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    profiles: [sqlserver]
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no .env}
+    volumes: [mssql-data:/var/opt/mssql]
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1' -b -o /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    networks:
+      default:
+        aliases: [db]
+    restart: unless-stopped
+
+  # cria o banco e o login da aplicação no SQL Server (roda uma vez e termina)
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    profiles: [sqlserver]
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      SA_PASSWORD: ${DB_PASSWORD}
+      APP_DB: ${DB_NAME:-prelo}
+      APP_USER: ${DB_USER:-prelo}
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - >
+        /opt/mssql-tools18/bin/sqlcmd -C -b -S db -U sa -P "$$SA_PASSWORD" -Q "
+        IF DB_ID('$$APP_DB') IS NULL CREATE DATABASE [$$APP_DB];
+        IF SUSER_ID('$$APP_USER') IS NULL CREATE LOGIN [$$APP_USER] WITH PASSWORD = '$$SA_PASSWORD', CHECK_POLICY = OFF;
+        EXEC('USE [$$APP_DB]; IF USER_ID(''$$APP_USER'') IS NULL BEGIN CREATE USER [$$APP_USER] FOR LOGIN [$$APP_USER]; ALTER ROLE db_owner ADD MEMBER [$$APP_USER]; END')"
+    restart: "no"
+
+  oracle:
+    image: gvenzl/oracle-free:23-slim-faststart
+    profiles: [oracle]
+    environment:
+      ORACLE_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no .env}
+      APP_USER: ${DB_USER:-prelo}
+      APP_USER_PASSWORD: ${DB_PASSWORD}
+    volumes: [oracle-data:/opt/oracle/oradata]
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
+    networks:
+      default:
+        aliases: [db]
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes", "--save", "60", "1000"]
+    volumes: [redis-data:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  api:
+    build: ./backend
+    environment:
+      DB_VENDOR: ${DB_VENDOR:-postgresql}
+      DB_HOST: db
+      DB_NAME: ${DB_NAME:-prelo}
+      DB_USER: ${DB_USER:-prelo}
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+      JWT_SECRET: ${JWT_SECRET:?Defina JWT_SECRET no .env}
+      APP_SEED_DEMO: ${APP_SEED_DEMO:-true}
+      PAYMENTS_SANDBOX: ${PAYMENTS_SANDBOX:-true}
+      APP_HTTPS: ${APP_HTTPS:-false}
+      APP_CORS_ORIGINS: ${APP_CORS_ORIGINS:-http://localhost:8080}
+      API_DOCS_ENABLED: ${API_DOCS_ENABLED:-true}
+      JAVA_TOOL_OPTIONS: ${API_JAVA_OPTS:-}
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+        required: false
+      mysql:
+        condition: service_healthy
+        required: false
+      sqlserver-init:
+        condition: service_completed_successfully
+        required: false
+      oracle:
+        condition: service_healthy
+        required: false
+    restart: unless-stopped
+
+  web:
+    build: ./frontend
+    ports:
+      - "${APP_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pg-data:
+  mysql-data:
+  mssql-data:
+  oracle-data:
+  redis-data:
