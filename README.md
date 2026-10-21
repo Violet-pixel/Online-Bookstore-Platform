@@ -246,12 +246,6 @@ docs/                     manuais em PDF e imagens do README
 .github/workflows/        integração contínua (testes nos quatro bancos)
 ```
 
-## Licença
-
-Copyright (©) 2026 Clara Portes
-
-Este projeto é distribuído sob a licença [MIT](LICENSE). Você pode usar, copiar, modificar e redistribuir o código, inclusive para fins comerciais, desde que mantenha o aviso de copyright e o texto da licença.
-
 ### Componentes de terceiros
 
 O Prelo depende de componentes com licenças próprias, que continuam valendo para cada um deles:
@@ -271,7 +265,8 @@ O Prelo depende de componentes com licenças próprias, que continuam valendo pa
 
 PostgreSQL, MySQL, SQL Server, Oracle e Redis rodam como serviços externos via Docker e não são redistribuídos neste repositório; cada um segue a licença da sua própria imagem (a do SQL Server roda na edição Developer, e a do Oracle, na edição Free).
 
-## Contribuidores
+## Licença
 
-- Clara Portes ([@Violet-pixel](https://github.com/Violet-pixel))
-- Erik Pimenta ([@havelroot](https://github.com/havelroot))
+Copyright (©) 2026 Clara Portes
+
+Este projeto é distribuído sob a licença [MIT](LICENSE). Você pode usar, copiar, modificar e redistribuir o código, inclusive para fins comerciais, desde que mantenha o aviso de copyright e o texto da licença.
