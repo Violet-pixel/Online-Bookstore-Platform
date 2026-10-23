@@ -61,7 +61,7 @@ export default function AdminBookForm() {
     <form className="stack fade" style={{ gap: 18 }} onSubmit={save}>
       <div className="stack" style={{ gap: 8 }}>
         <Link to="/admin/livros" className="subtle row" style={{ gap: 6 }}><ArrowLeft size={14} /> Livros</Link>
-        <h1 style={{ fontSize: 34 }}>{isNew ? 'Novo livro' : b.title}</h1>
+        <h1>{isNew ? 'Novo livro' : b.title}</h1>
       </div>
       <div className="order-grid">
         <div className="card stack" style={{ gap: 14 }}>

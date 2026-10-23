@@ -69,10 +69,10 @@ export function EmptyArt() {
   return (
     <svg className="art" viewBox="0 0 140 110" aria-hidden="true">
       <ellipse cx="70" cy="100" rx="52" ry="6" fill="var(--bg-soft)" />
-      <rect x="28" y="70" width="84" height="18" rx="4" fill="var(--text)" />
-      <rect x="36" y="50" width="72" height="18" rx="4" fill="#B86B84" />
-      <rect x="30" y="30" width="76" height="18" rx="4" fill="#E0B94F" transform="rotate(-6 68 39)" />
-      <circle cx="96" cy="16" r="6" fill="#B86B84">
+      <rect x="28" y="70" width="84" height="18" fill="var(--text)" />
+      <rect x="36" y="50" width="72" height="18" fill="#C8236A" />
+      <rect x="30" y="30" width="76" height="18" fill="#F2C230" transform="rotate(-6 68 39)" />
+      <circle cx="96" cy="16" r="6" fill="#0A84B8">
         <animate attributeName="cy" values="16;10;16" dur="2.4s" repeatCount="indefinite" />
       </circle>
     </svg>

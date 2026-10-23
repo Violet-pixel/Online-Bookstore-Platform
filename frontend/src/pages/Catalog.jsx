@@ -63,9 +63,9 @@ export default function Catalog({ mode }) {
           {mode === 'category' ? <><Link to="/categorias">Categorias</Link><span>/</span></> : mode === 'catalog' ? <><span>Catálogos</span><span>/</span></> : null}
           <span>{title || '...'}</span>
         </div>
-        {mode === 'catalog' && catalogInfo.data?.highlight && <span className="eyebrow">{catalogInfo.data.highlight}</span>}
         <h1>{title || <span className="skeleton" style={{ display: 'inline-block', width: 260, height: 40 }} />}</h1>
         {lead && <p>{lead}</p>}
+        {mode === 'catalog' && catalogInfo.data?.highlight && <p className="subtle">{catalogInfo.data.highlight}</p>}
       </div>
 
       <div className="listing">

@@ -66,15 +66,15 @@ export default function Book() {
           <div className="crumbs">
             <Link to="/">Início</Link><span>/</span><Link to={`/categorias/${b.category.slug}`}>{b.category.name}</Link>
           </div>
-          <h1 style={{ marginTop: 14 }}>{b.title}</h1>
-          {b.subtitle && <p className="muted serif" style={{ fontSize: 20, marginTop: 6 }}>{b.subtitle}</p>}
+          <h1 className="misreg" style={{ marginTop: 16 }}>{b.title}</h1>
+          {b.subtitle && <p className="muted serif" style={{ fontSize: 22, marginTop: 10 }}>{b.subtitle}</p>}
           <div className="row wrap" style={{ marginTop: 14, gap: 14 }}>
             <span style={{ fontWeight: 700 }}>{b.authors.map((a) => a.name).join(', ')}</span>
             <Stars rating={b.rating} count={b.ratingCount} />
             <span className="badge">{FORMAT[b.format]}</span>
           </div>
 
-          <div className="buy-box rise">
+          <div className="buy-box">
             <div className="row between wrap">
               <Price price={b.price} listPrice={b.listPrice} size="lg" />
               {b.inStock ? (
@@ -106,14 +106,14 @@ export default function Book() {
             {quote && (
               <div className="stack fade" style={{ gap: 6 }}>
                 {quote.map((o) => (
-                  <div key={o.code} className="sum-row"><span>{o.name} · {o.minDays}–{o.maxDays} dias úteis</span><b>{o.free ? 'Grátis' : money(o.fee)}</b></div>
+                  <div key={o.code} className="sum-row"><span>{o.name}, {o.minDays} a {o.maxDays} dias úteis</span><b>{o.free ? 'Grátis' : money(o.fee)}</b></div>
                 ))}
               </div>
             )}
             <button type="button" className="btn btn-ghost btn-sm" style={{ alignSelf: 'flex-start' }} onClick={() => setOpen(true)}>Ver carrinho</button>
           </div>
 
-          <h3 style={{ marginBottom: 10 }}>Sinopse</h3>
+          <h3 style={{ marginBottom: 12 }}>Sinopse</h3>
           <p className="synopsis">{b.synopsis}</p>
           <div className="specs" style={{ marginTop: 26 }}>
             <div className="spec"><span>Editora</span><b>{b.publisher}</b></div>
@@ -127,7 +127,7 @@ export default function Book() {
       </div>
       {b.related.length > 0 && (
         <section className="section" style={{ marginTop: 70 }}>
-          <div className="rail-head"><div><span className="eyebrow">Na mesma estante</span><h2 style={{ marginTop: 6 }}>Você também pode gostar</h2></div></div>
+          <div className="rail-head"><div><h2>Da mesma estante</h2><p>Outros livros de {b.category.name}.</p></div></div>
           <div className="rail">{b.related.map((r, i) => <BookCard key={r.id} book={r} index={i} />)}</div>
         </section>
       )}

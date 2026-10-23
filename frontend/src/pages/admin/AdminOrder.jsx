@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, XCircle } from 'lucide-react';
+import { ArrowLeft, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { Field, OrderBadge, Spinner } from '../../components/Bits.jsx';
@@ -37,7 +37,7 @@ export default function AdminOrder() {
   }
 
   const actions = (
-    <section className="card rise" style={{ borderColor: next ? 'var(--accent)' : undefined }}>
+    <section className="card" style={{ borderColor: next ? 'var(--accent)' : undefined, borderTopWidth: next ? 4 : undefined }}>
       <h3 style={{ marginBottom: 12 }}>Ações</h3>
       {next ? (
         <div className="stack" style={{ gap: 12 }}>
@@ -48,7 +48,7 @@ export default function AdminOrder() {
           )}
           <Field label="Observação para o cliente (opcional)"><input className="input" value={note} onChange={(e) => setNote(e.target.value)} /></Field>
           <button type="button" className="btn btn-primary btn-block" disabled={!!busy} onClick={advance}>
-            {busy === 'advance' ? <Spinner /> : null} Marcar como “{SHIPMENT_STATUS[next]}” <ArrowRight size={16} />
+            {busy === 'advance' ? <Spinner /> : null} Marcar como “{SHIPMENT_STATUS[next]}”
           </button>
         </div>
       ) : <p className="muted">{order.status === 'PENDING_PAYMENT' ? 'Aguardando o pagamento do cliente.' : 'Nenhuma ação pendente.'}</p>}
@@ -65,8 +65,8 @@ export default function AdminOrder() {
       <div className="order-head" style={{ paddingTop: 0 }}>
         <div className="stack" style={{ gap: 8 }}>
           <Link to="/admin/pedidos" className="subtle row" style={{ gap: 6 }}><ArrowLeft size={14} /> Pedidos</Link>
-          <h1 style={{ fontSize: 32 }}>Pedido <span className="mono" style={{ fontSize: 28 }}>{order.code}</span></h1>
-          <span className="muted">{order.customer?.fullName} · {dateTime(order.placedAt)}</span>
+          <h1 className="num" style={{ fontSize: 'clamp(30px, 3.6vw, 42px)' }}>Pedido {order.code}</h1>
+          <span className="muted">Feito por {order.customer?.fullName} em {dateTime(order.placedAt)}</span>
         </div>
         <OrderBadge status={order.status} />
       </div>

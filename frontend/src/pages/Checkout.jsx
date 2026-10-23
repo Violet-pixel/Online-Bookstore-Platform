@@ -1,4 +1,4 @@
-import { ArrowRight, Check, MapPin, Plus, Tag, Truck } from 'lucide-react';
+import { Check, MapPin, Plus, Tag, Truck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import AddressForm from '../components/AddressForm.jsx';
@@ -103,8 +103,8 @@ export default function Checkout() {
                     <span className="radio" />
                     <div className="stack" style={{ gap: 2 }}>
                       <b>{a.label} {a.isDefault && <span className="badge" style={{ marginLeft: 6 }}>principal</span>}</b>
-                      <span className="muted" style={{ fontSize: 14 }}>{a.street}, {a.streetNumber}{a.complement ? ` · ${a.complement}` : ''} · {a.district}</span>
-                      <span className="subtle">{a.city}/{a.state} · CEP {a.zipCode} · {a.recipient}</span>
+                      <span className="muted" style={{ fontSize: 14 }}>{a.street}, {a.streetNumber}{a.complement ? `, ${a.complement}` : ''}, {a.district}</span>
+                      <span className="subtle">{a.city}/{a.state}, CEP {a.zipCode}. Recebe: {a.recipient}</span>
                     </div>
                   </label>
                 ))}
@@ -123,7 +123,7 @@ export default function Checkout() {
                     <span className="radio" />
                     <div className="grow stack" style={{ gap: 2 }}>
                       <b>{o.name}</b>
-                      <span className="muted" style={{ fontSize: 14 }}>{o.description} · {o.carrier}</span>
+                      <span className="muted" style={{ fontSize: 14 }}>{o.description}, por {o.carrier}</span>
                       <span className="subtle">{o.minDays} a {o.maxDays} dias úteis após o pagamento</span>
                     </div>
                     <b style={{ color: o.free ? 'var(--success)' : undefined }}>{o.free ? 'Grátis' : money(o.fee)}</b>
@@ -159,12 +159,12 @@ export default function Checkout() {
               </span>
             )}
             <hr className="sep" style={{ margin: 0 }} />
-            <div className="sum-row"><span>Subtotal · {plural(quote?.itemCount ?? cart.itemCount, 'item', 'itens')}</span><span>{money(quote?.subtotal ?? cart.subtotal)}</span></div>
+            <div className="sum-row"><span>Subtotal ({plural(quote?.itemCount ?? cart.itemCount, 'item', 'itens')})</span><span>{money(quote?.subtotal ?? cart.subtotal)}</span></div>
             {Number(quote?.discount) > 0 && <div className="sum-row" style={{ color: 'var(--success)' }}><span>Desconto</span><span>-{money(quote.discount)}</span></div>}
             <div className="sum-row"><span>Frete</span><span>{option ? (option.free ? 'Grátis' : money(option.fee)) : '—'}</span></div>
             <div className="sum-row total"><span>Total</span><span>{money(total)}</span></div>
             <button type="button" className="btn btn-primary btn-lg btn-block" disabled={!addressId || !method || busy} onClick={place}>
-              {busy ? <Spinner /> : null} Ir para o pagamento <ArrowRight size={18} />
+              {busy ? <Spinner /> : null} Ir para o pagamento
             </button>
             <p className="subtle" style={{ textAlign: 'center' }}>O estoque fica reservado por 60 minutos enquanto você paga.</p>
           </div>

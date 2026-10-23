@@ -7,8 +7,8 @@ export default function Footer() {
       <div className="container footer-grid">
         <div className="stack" style={{ gap: 14 }}>
           <Link to="/" className="brand" style={{ fontSize: 22 }}><Logo /></Link>
-          <p style={{ maxWidth: 320 }}>Livros escolhidos com cuidado, entregues em todo o Brasil. Projeto de demonstração: pagamentos em modo sandbox.</p>
-          <p className="subtle">Copyright (©) 2026 Clara Portes · Licença MIT</p>
+          <p style={{ maxWidth: 340 }}>Livraria online com entrega em todo o Brasil. Projeto de demonstração: os pagamentos rodam em modo sandbox.</p>
+          <p className="subtle">Copyright (©) 2026 Clara Portes<br />Licença MIT</p>
         </div>
         <div>
           <h4>Explorar</h4>

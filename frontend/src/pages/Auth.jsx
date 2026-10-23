@@ -1,4 +1,4 @@
-import { ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import BookCover from '../components/BookCover.jsx';
@@ -39,16 +39,15 @@ export default function Auth({ mode }) {
   return (
     <div className="auth page" style={{ paddingBottom: 0 }}>
       <div className="auth-art">
-        <div className="floaty" style={{ top: 70, left: 60, rotate: '-8deg' }}><BookCover title="O Último Bibliotecário" authors="Sofia Carvalho" style={7} /></div>
-        <div className="floaty" style={{ top: 150, left: 250, width: 170, animationDelay: '-2s' }}><BookCover title="Dom Casmurro" authors="Machado de Assis" style={2} /></div>
-        <div className="floaty" style={{ top: 60, left: 440, rotate: '9deg', animationDelay: '-4s' }}><BookCover title="Orgulho e Preconceito" authors="Jane Austen" style={3} /></div>
-        <span className="eyebrow" style={{ color: 'var(--butter)' }}>Prelo</span>
-        <h2 style={{ marginTop: 12 }}>{register ? 'Sua estante começa com uma conta.' : 'Que bom ver você de volta.'}</h2>
-        <p style={{ opacity: .75, marginTop: 12, maxWidth: 420 }}>Acompanhe pedidos, salve endereços e pague com Pix, boleto ou cartão em até 6x.</p>
+        <div className="floaty" style={{ top: 150, left: 56 }}><BookCover title="O Último Bibliotecário" authors="Sofia Carvalho" style={7} /></div>
+        <div className="floaty" style={{ top: 210, left: 236, width: 170 }}><BookCover title="Dom Casmurro" authors="Machado de Assis" style={2} /></div>
+        <div className="floaty" style={{ top: 172, left: 434 }}><BookCover title="Orgulho e Preconceito" authors="Jane Austen" style={3} /></div>
+        <h2 className="misreg">{register ? 'Sua estante começa com uma conta.' : 'Que bom ver você de volta.'}</h2>
+        <p style={{ marginTop: 14, maxWidth: 420 }}>Acompanhe pedidos, salve endereços e pague com Pix, boleto ou cartão em até 6x.</p>
       </div>
       <div className="auth-form">
-        <form onSubmit={submit} className="rise">
-          <div><h1 style={{ fontSize: 36 }}>{register ? 'Criar conta' : 'Entrar'}</h1>
+        <form onSubmit={submit}>
+          <div><h1 style={{ fontSize: 44 }}>{register ? 'Criar conta' : 'Entrar'}</h1>
             <p className="muted" style={{ marginTop: 6 }}>{register ? 'Leva menos de um minuto.' : 'Use seu e-mail e senha.'}</p></div>
           {message && <div className="alert red fade">{message}</div>}
           {register && (
@@ -68,16 +67,16 @@ export default function Auth({ mode }) {
             </div>
           </Field>
           <button type="submit" className="btn btn-primary btn-lg btn-block" disabled={busy}>
-            {busy ? <Spinner /> : null} {register ? 'Criar conta' : 'Entrar'} <ArrowRight size={18} />
+            {busy ? <Spinner /> : null} {register ? 'Criar conta' : 'Entrar'}
           </button>
           <p className="muted" style={{ textAlign: 'center', fontSize: 14 }}>
-            {register ? <>Já tem conta? <Link to={`/entrar?voltar=${encodeURIComponent(back)}`} style={{ fontWeight: 800, color: 'var(--accent-strong)' }}>Entrar</Link></>
-              : <>Primeira vez aqui? <Link to={`/cadastro?voltar=${encodeURIComponent(back)}`} style={{ fontWeight: 800, color: 'var(--accent-strong)' }}>Criar conta</Link></>}
+            {register ? <>Já tem conta? <Link to={`/entrar?voltar=${encodeURIComponent(back)}`} className="link" style={{ fontWeight: 700 }}>Entrar</Link></>
+              : <>Primeira vez aqui? <Link to={`/cadastro?voltar=${encodeURIComponent(back)}`} className="link" style={{ fontWeight: 700 }}>Criar conta</Link></>}
           </p>
           {!register && (
             <div className="demo-box">
               Contas de demonstração (senha <b>Prelo@2026</b>):{' '}
-              <button type="button" onClick={() => demo('leitora@prelo.dev')}>leitora@prelo.dev</button> ·{' '}
+              <button type="button" onClick={() => demo('leitora@prelo.dev')}>leitora@prelo.dev</button> ou{' '}
               <button type="button" onClick={() => demo('admin@prelo.dev')}>admin@prelo.dev</button>
             </div>
           )}

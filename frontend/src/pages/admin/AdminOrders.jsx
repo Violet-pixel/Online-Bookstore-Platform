@@ -18,7 +18,7 @@ export default function AdminOrders() {
   const set = (next) => setParams(Object.fromEntries(Object.entries({ status, q, ...next }).filter(([, v]) => v !== '' && v !== undefined)));
   return (
     <div className="stack fade" style={{ gap: 18 }}>
-      <div className="row between wrap"><h1 style={{ fontSize: 36 }}>Pedidos e envios</h1>
+      <div className="row between wrap"><h1>Pedidos e envios</h1>
         <form className="search" style={{ maxWidth: 320 }} onSubmit={(e) => { e.preventDefault(); set({ q: term, pagina: '' }); }}>
           <Search className="icon" /><input value={term} onChange={(e) => setTerm(e.target.value)} placeholder="Código, cliente ou e-mail" />
         </form>
@@ -33,13 +33,13 @@ export default function AdminOrders() {
             <tbody>
               {data?.items.map((o) => (
                 <tr key={o.code}>
-                  <td><Link to={`/admin/pedidos/${o.code}`} className="mono" style={{ fontWeight: 800 }}>{o.code}</Link></td>
+                  <td><Link to={`/admin/pedidos/${o.code}`} className="mono" style={{ fontWeight: 700, color: 'var(--link)' }}>{o.code}</Link></td>
                   <td>{o.customerName}</td>
                   <td className="subtle">{dateTime(o.placedAt)}</td>
                   <td><OrderBadge status={o.status} /></td>
                   <td className="subtle">{o.shipmentStatus ? SHIPMENT_STATUS[o.shipmentStatus] : '—'}</td>
                   <td className="subtle">{o.paymentMethod ? PAYMENT_METHOD[o.paymentMethod] : '—'}</td>
-                  <td style={{ textAlign: 'right', fontWeight: 800 }}>{money(o.total)}</td>
+                  <td style={{ textAlign: 'right', fontWeight: 700 }}>{money(o.total)}</td>
                 </tr>
               ))}
             </tbody>

@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronLeft, ChevronRight, CreditCard, RotateCcw, Truck } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CreditCard, RotateCcw, Truck } from 'lucide-react';
 import { useRef } from 'react';
 import { Link } from 'react-router';
 import { GridSkeleton } from '../components/Bits.jsx';
@@ -12,14 +12,14 @@ function Rail({ catalog, index }) {
   const ref = useRef(null);
   const scroll = (dir) => ref.current?.scrollBy({ left: dir * ref.current.clientWidth * 0.8, behavior: 'smooth' });
   return (
-    <section className="section rise" style={{ '--i': index }}>
+    <section className="section">
       <div className="rail-head">
         <div>
-          <span className="eyebrow">{catalog.highlight}</span>
-          <h2 style={{ marginTop: 6 }}>{catalog.name}</h2>
+          <h2>{catalog.name}</h2>
+          {catalog.highlight && <p>{catalog.highlight}</p>}
         </div>
         <div className="row">
-          <Link to={`/catalogos/${catalog.slug}`} className="btn btn-ghost btn-sm">Ver tudo <ArrowRight size={15} /></Link>
+          <Link to={`/catalogos/${catalog.slug}`} className="btn btn-ghost btn-sm">Ver tudo</Link>
           <div className="rail-nav desktop-only">
             <button type="button" className="btn btn-icon btn-sm" onClick={() => scroll(-1)} aria-label="Voltar"><ChevronLeft size={16} /></button>
             <button type="button" className="btn btn-icon btn-sm" onClick={() => scroll(1)} aria-label="Avançar"><ChevronRight size={16} /></button>
@@ -43,20 +43,16 @@ export default function Home() {
   return (
     <div className="container page">
       <section className="hero">
-        <span className="blob b1" /><span className="blob b2" />
+        <span className="crop tl" /><span className="crop tr" /><span className="crop bl" /><span className="crop br" />
+        <span className="reg top" /><span className="reg side" />
         <div className="hero-inner">
           <div>
-            <span className="eyebrow" style={{ color: '#9E5570' }}>{user ? `${greeting()}, ${user.fullName.split(' ')[0]}` : 'Livraria online'}</span>
-            <h1 style={{ marginTop: 12 }}>Histórias que acabaram de <em>sair do prelo</em>.</h1>
+            {user && <p className="hello">{greeting()}, {user.fullName.split(' ')[0]}.</p>}
+            <h1 className="misreg settle">Histórias que acabaram de sair do prelo.</h1>
             <p>Clássicos, lançamentos e livros técnicos escolhidos a dedo, com frete grátis acima de R$ 199 e Pix aprovado na hora.</p>
             <div className="row wrap">
-              <Link to="/catalogos/lancamentos" className="btn btn-dark btn-lg">Ver lançamentos <ArrowRight size={18} /></Link>
+              <Link to="/catalogos/lancamentos" className="btn btn-dark btn-lg">Ver lançamentos</Link>
               <Link to="/categorias" className="btn btn-ghost btn-lg">Explorar categorias</Link>
-            </div>
-            <div className="stats">
-              <div><b>{data ? data.categories.length : '—'}</b>categorias</div>
-              <div><b>{data ? data.catalogs.length : '—'}</b>catálogos</div>
-              <div><b>6x</b>sem juros</div>
             </div>
           </div>
           <div className="hero-books" aria-hidden="true">
@@ -67,12 +63,16 @@ export default function Home() {
             ))}
           </div>
         </div>
+        <div className="hero-foot">
+          <span className="colorbar" aria-hidden="true"><i /><i /><i /><i /><i /><i /><i /></span>
+          <span className="subtle">{data ? `${data.categories.length} categorias e ${data.catalogs.length} catálogos` : ' '}</span>
+        </div>
       </section>
 
       <section className="section band">
-        <div className="perk rise" style={{ '--i': 0 }}><span className="ic"><Truck size={20} /></span><div><h4>Frete grátis acima de R$ 199</h4><p>Na entrega econômica, para todo o Brasil.</p></div></div>
-        <div className="perk rise" style={{ '--i': 1 }}><span className="ic"><CreditCard size={20} /></span><div><h4>Pix, boleto ou 6x sem juros</h4><p>Escolha na janela de pagamento.</p></div></div>
-        <div className="perk rise" style={{ '--i': 2 }}><span className="ic"><RotateCcw size={20} /></span><div><h4>Cancelamento simples</h4><p>Antes do envio, com estorno automático.</p></div></div>
+        <div className="perk"><Truck className="ic" size={20} /><div><h4>Frete grátis acima de R$ 199</h4><p>Na entrega econômica, para todo o Brasil.</p></div></div>
+        <div className="perk"><CreditCard className="ic" size={20} /><div><h4>Pix, boleto ou 6x sem juros</h4><p>Você escolhe na janela de pagamento.</p></div></div>
+        <div className="perk"><RotateCcw className="ic" size={20} /><div><h4>Cancelamento antes do envio</h4><p>O estorno sai sozinho, na mesma forma de pagamento.</p></div></div>
       </section>
 
       {loading && <GridSkeleton n={6} />}
@@ -80,11 +80,11 @@ export default function Home() {
 
       {data && (
         <section className="section">
-          <div className="rail-head"><div><span className="eyebrow">Por onde começar</span><h2 style={{ marginTop: 6 }}>Categorias</h2></div>
-            <Link to="/categorias" className="btn btn-ghost btn-sm">Todas <ArrowRight size={15} /></Link></div>
+          <div className="rail-head"><div><h2>Categorias</h2><p>Escolha uma estante para começar.</p></div>
+            <Link to="/categorias" className="btn btn-ghost btn-sm">Todas as categorias</Link></div>
           <div className="cat-grid">
-            {data.categories.map((c, i) => (
-              <Link key={c.id} to={`/categorias/${c.slug}`} className="cat-tile rise" style={{ '--i': i }}>
+            {data.categories.map((c) => (
+              <Link key={c.id} to={`/categorias/${c.slug}`} className="cat-tile">
                 <span className="swatch" style={{ background: c.accent }} />
                 <h3>{c.name}</h3>
                 <span className="n">{c.bookCount} {c.bookCount === 1 ? 'livro' : 'livros'}</span>
@@ -95,12 +95,11 @@ export default function Home() {
       )}
 
       {data && (
-        <section className="section promo rise">
+        <section className="section promo">
           <span className="ring" />
           <div className="stack" style={{ gap: 8, position: 'relative' }}>
-            <span className="eyebrow" style={{ color: 'var(--butter)' }}>Primeira compra</span>
-            <h3>10% de desconto em qualquer livro</h3>
-            <p style={{ opacity: .8 }}>Use o cupom no carrinho. Vale também para os lançamentos.</p>
+            <h3>10% de desconto na primeira compra</h3>
+            <p>Digite o cupom no carrinho. Vale para qualquer livro, inclusive lançamentos.</p>
           </div>
           <span className="code">BEMVINDO10</span>
         </section>

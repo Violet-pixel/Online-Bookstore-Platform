@@ -25,12 +25,12 @@ export function Timeline({ events }) {
       {list.map((e, i) => {
         const Icon = i === 0 && e.status !== 'DELIVERED' ? ICON[e.status] || Package : Check;
         return (
-          <div key={`${e.occurredAt}-${i}`} className={`tl-item ${i === 0 ? (e.status === 'DELIVERED' ? 'done' : 'now') : 'done'}`} style={{ '--i': i }}>
+          <div key={`${e.occurredAt}-${i}`} className={`tl-item ${i === 0 ? (e.status === 'DELIVERED' ? 'done' : 'now') : 'done'}`}>
             <span className="tl-dot"><Icon size={14} /></span>
             <div className="stack" style={{ gap: 2 }}>
               <h4>{e.title}</h4>
               {e.detail && <span className="muted" style={{ fontSize: 14 }}>{e.detail}</span>}
-              <span className="when">{dateTime(e.occurredAt)}{e.location ? ` · ${e.location}` : ''}</span>
+              <span className="when">{dateTime(e.occurredAt)}{e.location ? `, ${e.location}` : ''}</span>
             </div>
           </div>
         );

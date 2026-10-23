@@ -1,4 +1,4 @@
-import { ArrowRight, Truck } from 'lucide-react';
+import { Truck } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useCart } from '../lib/cart.jsx';
 import { money } from '../lib/format.js';
@@ -14,7 +14,7 @@ export default function CartDrawer() {
   const missing = Math.max(0, FREE - Number(cart.subtotal));
   const pct = Math.min(100, (Number(cart.subtotal) / FREE) * 100);
   return (
-    <Drawer open={open} onClose={() => setOpen(false)} title={`Carrinho${cart.itemCount ? ` · ${cart.itemCount}` : ''}`}
+    <Drawer open={open} onClose={() => setOpen(false)} title={`Carrinho${cart.itemCount ? ` (${cart.itemCount})` : ''}`}
       footer={cart.itemCount ? (close) => (
         <>
           <div className="stack" style={{ gap: 8 }}>
@@ -26,13 +26,13 @@ export default function CartDrawer() {
           </div>
           <div className="sum-row total"><span>Subtotal</span><span>{money(cart.subtotal)}</span></div>
           <button type="button" className="btn btn-primary btn-lg btn-block" onClick={() => { close(); navigate('/carrinho'); }}>
-            Fechar pedido <ArrowRight size={18} />
+            Ver carrinho e fechar pedido
           </button>
         </>
       ) : null}>
       {(close) => (cart.itemCount ? <CartLines compact onNavigate={close} /> : (
         <Empty title="Seu carrinho está vazio" action={<button type="button" className="btn btn-dark" onClick={() => { close(); navigate('/livros'); }}>Explorar livros</button>}>
-          Que tal começar pelos mais vendidos?
+          Os livros que você adicionar aparecem aqui.
         </Empty>
       ))}
     </Drawer>

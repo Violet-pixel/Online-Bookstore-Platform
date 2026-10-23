@@ -1,4 +1,4 @@
-import { ArrowRight, ShoppingBag, Tag } from 'lucide-react';
+import { ShoppingBag, Tag } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import CartLines from '../components/CartLines.jsx';
@@ -36,7 +36,7 @@ export default function Cart() {
   }
   return (
     <div className="container page">
-      <div className="listing-head"><h1>Carrinho</h1><p>{plural(cart.itemCount, 'livro', 'livros')} esperando por você.</p></div>
+      <div className="listing-head"><h1>Carrinho</h1><p>{plural(cart.itemCount, 'livro', 'livros')} no carrinho.</p></div>
       <div className="two-col" style={{ paddingTop: 0 }}>
         <div className="card"><CartLines /></div>
         <aside className="aside stack" style={{ gap: 14 }}>
@@ -51,7 +51,7 @@ export default function Cart() {
             </form>
             {options?.error && <span className="err" style={{ color: 'var(--danger)', fontSize: 13 }}>{options.error}</span>}
             {Array.isArray(options) && options.map((o) => (
-              <div key={o.code} className="sum-row fade"><span>{o.name} · {o.minDays}–{o.maxDays} dias</span><b>{o.free ? 'Grátis' : money(o.fee)}</b></div>
+              <div key={o.code} className="sum-row fade"><span>{o.name}, {o.minDays} a {o.maxDays} dias</span><b>{o.free ? 'Grátis' : money(o.fee)}</b></div>
             ))}
             <div className="field">
               <label htmlFor="cupom"><Tag size={13} style={{ display: 'inline', marginRight: 6 }} />Cupom</label>
@@ -61,7 +61,7 @@ export default function Cart() {
             <hr className="sep" style={{ margin: '4px 0' }} />
             <div className="sum-row total"><span>Total parcial</span><span>{money(cart.subtotal)}</span></div>
             <button type="button" className="btn btn-primary btn-lg btn-block" onClick={goCheckout}>
-              {user ? 'Continuar' : 'Entrar e continuar'} <ArrowRight size={18} />
+              {user ? 'Fechar pedido' : 'Entrar e fechar pedido'}
             </button>
           </div>
           <Link to="/livros" className="btn btn-ghost">Continuar comprando</Link>

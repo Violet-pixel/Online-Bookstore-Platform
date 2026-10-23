@@ -25,7 +25,7 @@ export default function BookCard({ book, index = 0 }) {
   }
 
   return (
-    <Link to={`/livro/${book.slug}`} className="book-card rise" style={{ '--i': index % 12 }}>
+    <Link to={`/livro/${book.slug}`} className="book-card">
       <div className="cover-wrap" style={{ position: 'relative' }}>
         <BookCover title={book.title} authors={book.authors} style={book.coverStyle} />
         {book.inStock ? (

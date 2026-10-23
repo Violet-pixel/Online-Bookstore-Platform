@@ -14,7 +14,7 @@ export default function Admin() {
     <div className="container page">
       <div className="admin">
         <nav className="side-nav">
-          <span className="eyebrow" style={{ padding: '0 12px 10px' }}>Administração</span>
+          <span style={{ padding: '4px 10px 10px', fontWeight: 700, fontSize: 14.5 }}>Administração</span>
           <NavLink to="/admin" end><LayoutDashboard size={16} /> Painel</NavLink>
           <NavLink to="/admin/pedidos"><Package size={16} /> Pedidos e envios</NavLink>
           <NavLink to="/admin/livros"><BookOpen size={16} /> Livros e estoque</NavLink>

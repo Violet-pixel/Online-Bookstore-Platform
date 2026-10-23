@@ -25,10 +25,10 @@ export function OrderView({ order, admin, actions }) {
     <div className="order-grid">
       <div className="stack" style={{ gap: 18 }}>
         {s && (
-          <section className="card rise">
+          <section className="card">
             <div className="panel-title">
               <h3 className="row" style={{ gap: 10 }}><Truck size={18} /> Detalhes do envio</h3>
-              <span className="subtle">{s.serviceName} · {s.carrier}</span>
+              <span className="subtle">{s.serviceName}, por {s.carrier}</span>
             </div>
             {s.status !== 'RETURNED' && <ShipmentSteps status={s.status} />}
             <div className="row wrap" style={{ margin: '18px 0', gap: 10 }}>
@@ -50,8 +50,8 @@ export function OrderView({ order, admin, actions }) {
             <Timeline events={s.events} />
           </section>
         )}
-        <section className="card rise" style={{ '--i': 1 }}>
-          <div className="panel-title"><h3>Itens · {plural(order.itemCount, 'livro', 'livros')}</h3></div>
+        <section className="card">
+          <div className="panel-title"><h3>Itens</h3><span className="subtle">{plural(order.itemCount, 'livro', 'livros')}</span></div>
           {order.items.map((it) => (
             <div key={it.bookId} className="line">
               <Link to={`/livro/${it.slug}`}><BookCover title={it.title} authors={it.authors} style={it.coverStyle} showText={false} /></Link>
@@ -68,25 +68,25 @@ export function OrderView({ order, admin, actions }) {
 
       <div className="stack" style={{ gap: 18 }}>
         {actions}
-        <section className="card rise" style={{ '--i': 2 }}>
+        <section className="card">
           <h3 style={{ marginBottom: 14 }}>Resumo</h3>
           <div className="stack" style={{ gap: 8 }}>
             <div className="sum-row"><span>Subtotal</span><span>{money(order.subtotal)}</span></div>
             {Number(order.discount) > 0 && <div className="sum-row" style={{ color: 'var(--success)' }}><span>Desconto {order.couponCode ? `(${order.couponCode})` : ''}</span><span>-{money(order.discount)}</span></div>}
-            <div className="sum-row"><span>Frete · {order.shipping.name}</span><span>{Number(order.shippingFee) === 0 ? 'Grátis' : money(order.shippingFee)}</span></div>
+            <div className="sum-row"><span>Frete ({order.shipping.name})</span><span>{Number(order.shippingFee) === 0 ? 'Grátis' : money(order.shippingFee)}</span></div>
             <hr className="sep" style={{ margin: '6px 0' }} />
             <div className="sum-row total"><span>Total</span><span>{money(order.total)}</span></div>
           </div>
         </section>
-        <section className="card rise" style={{ '--i': 3 }}>
+        <section className="card">
           <h3 className="row" style={{ gap: 10, marginBottom: 12 }}><CreditCard size={18} /> Pagamento</h3>
           {order.payments.length === 0 ? <p className="muted">Nenhuma tentativa de pagamento ainda.</p> : (
             <div className="stack" style={{ gap: 10 }}>
               {[...order.payments].reverse().map((p) => (
                 <div key={p.reference} className="row between" style={{ fontSize: 14 }}>
                   <div className="stack" style={{ gap: 2 }}>
-                    <b>{PAYMENT_METHOD[p.method]}{p.cardLast4 ? ` · ${p.cardBrand} final ${p.cardLast4}` : ''}{p.installments > 1 ? ` · ${p.installments}x` : ''}</b>
-                    <span className="subtle">{dateTime(p.createdAt)}{p.failureReason ? ` · ${p.failureReason}` : ''}</span>
+                    <b>{PAYMENT_METHOD[p.method]}{p.cardLast4 ? `, ${p.cardBrand} final ${p.cardLast4}` : ''}{p.installments > 1 ? ` em ${p.installments}x` : ''}</b>
+                    <span className="subtle">{dateTime(p.createdAt)}{p.failureReason ? `. ${p.failureReason}` : ''}</span>
                   </div>
                   <PaymentBadge status={p.status} />
                 </div>
@@ -94,15 +94,15 @@ export function OrderView({ order, admin, actions }) {
             </div>
           )}
         </section>
-        <section className="card rise" style={{ '--i': 4 }}>
+        <section className="card">
           <h3 className="row" style={{ gap: 10, marginBottom: 12 }}><MapPin size={18} /> Entrega</h3>
           <p style={{ fontWeight: 700 }}>{order.shipTo.recipient}</p>
           <p className="muted" style={{ fontSize: 14 }}>
-            {order.shipTo.street}, {order.shipTo.number}{order.shipTo.complement ? ` · ${order.shipTo.complement}` : ''}<br />
-            {order.shipTo.district} · {order.shipTo.city}/{order.shipTo.state} · CEP {order.shipTo.zipCode}
+            {order.shipTo.street}, {order.shipTo.number}{order.shipTo.complement ? `, ${order.shipTo.complement}` : ''}<br />
+            {order.shipTo.district}, {order.shipTo.city}/{order.shipTo.state}<br />CEP {order.shipTo.zipCode}
           </p>
-          <p className="subtle" style={{ marginTop: 8 }}>{order.shipping.name} · {order.shipping.minDays} a {order.shipping.maxDays} dias úteis</p>
-          {admin && order.customer && <p className="subtle" style={{ marginTop: 8 }}>Cliente: {order.customer.fullName} · {order.customer.email}</p>}
+          <p className="subtle" style={{ marginTop: 8 }}>{order.shipping.name}, {order.shipping.minDays} a {order.shipping.maxDays} dias úteis</p>
+          {admin && order.customer && <p className="subtle" style={{ marginTop: 8 }}>Cliente: {order.customer.fullName} ({order.customer.email})</p>}
         </section>
       </div>
     </div>
@@ -136,7 +136,7 @@ export default function Order() {
   }
 
   const actions = (order.canPay || order.canCancel) ? (
-    <section className="card rise" style={{ borderColor: order.canPay ? 'var(--gold)' : undefined, background: order.canPay ? 'var(--butter-soft)' : undefined }}>
+    <section className="card" style={{ borderColor: order.canPay ? 'var(--yellow)' : undefined, borderTopWidth: order.canPay ? 4 : undefined }}>
       {order.canPay && (
         <div className="stack" style={{ gap: 12 }}>
           <b style={{ fontSize: 16 }}>Falta só o pagamento</b>
@@ -157,8 +157,8 @@ export default function Order() {
       <div className="order-head">
         <div className="stack" style={{ gap: 10 }}>
           <Link to="/compras" className="subtle row" style={{ gap: 6 }}><ArrowLeft size={14} /> Minhas compras</Link>
-          <h1 className="mono" style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(26px, 3.4vw, 38px)' }}>Pedido {order.code}</h1>
-          <span className="muted">Feito em {dateTime(order.placedAt)}{order.paidAt ? ` · pago em ${dateTime(order.paidAt)}` : ''}</span>
+          <h1 className="num" style={{ fontSize: 'clamp(30px, 3.8vw, 44px)' }}>Pedido {order.code}</h1>
+          <span className="muted">Feito em {dateTime(order.placedAt)}{order.paidAt ? `, pago em ${dateTime(order.paidAt)}` : ''}</span>
         </div>
         <OrderBadge status={order.status} />
       </div>

@@ -5,7 +5,8 @@ import { post, put } from '../../lib/api.js';
 import { useFetch } from '../../lib/hooks.js';
 import { useToast } from '../../lib/toast.jsx';
 
-const PALETTE = ['#B86B84', '#E0B94F', '#FFDF7F', '#212121', '#DADADA', '#EAEAEA'];
+// Tintas da livraria para a cor de cada categoria
+const PALETTE = ['#C8236A', '#0A84B8', '#F2C230', '#1B1B1D', '#D6D6CF', '#E4E4DD'];
 
 function CategoryRow({ c, onSave }) {
   const [v, setV] = useState(c);
@@ -17,7 +18,7 @@ function CategoryRow({ c, onSave }) {
         <div className="row" style={{ gap: 4 }}>
           {PALETTE.map((p) => (
             <button key={p} type="button" aria-label={`Cor ${p}`} onClick={() => setV({ ...v, accent: p })}
-              style={{ width: 20, height: 20, borderRadius: 6, border: v.accent === p ? '2px solid var(--text)' : '1px solid var(--line)', background: p }} />
+              style={{ width: 20, height: 20, borderRadius: 0, border: v.accent === p ? '2px solid var(--text)' : '1px solid var(--line)', outline: v.accent === p ? '1px solid var(--bg)' : 'none', outlineOffset: -3, background: p }} />
           ))}
         </div>
         <input className="input grow" style={{ height: 38, minWidth: 160 }} value={v.name} onChange={(e) => setV({ ...v, name: e.target.value })} />
@@ -46,7 +47,7 @@ export default function AdminTaxonomy() {
   async function addCategory(e) {
     e.preventDefault();
     try {
-      await post('/api/admin/categories', { name, description: null, accent: '#B86B84', sortOrder: (categories.data?.length || 0) + 1, active: true });
+      await post('/api/admin/categories', { name, description: null, accent: '#C8236A', sortOrder: (categories.data?.length || 0) + 1, active: true });
       setName('');
       categories.reload();
     } catch (err) { toast(err.message, { error: true }); }
@@ -66,7 +67,7 @@ export default function AdminTaxonomy() {
 
   return (
     <div className="stack fade" style={{ gap: 22 }}>
-      <h1 style={{ fontSize: 36 }}>Categorias e catálogos</h1>
+      <h1>Categorias e catálogos</h1>
       <section className="card">
         <div className="panel-title"><h3>Categorias</h3></div>
         <div className="stack" style={{ gap: 8 }}>
@@ -78,11 +79,11 @@ export default function AdminTaxonomy() {
         </form>
       </section>
       <section className="card">
-        <div className="panel-title"><h3>Catálogos curados</h3><span className="subtle">A ordem dos livros segue a lista do catálogo.</span></div>
+        <div className="panel-title"><h3>Catálogos</h3><span className="subtle">A ordem dos livros segue a lista do catálogo.</span></div>
         <div className="stack" style={{ gap: 8 }}>
           {catalogs.data?.map((c) => (
             <div key={c.id} className="addr" style={{ alignItems: 'center' }}>
-              <div className="stack" style={{ gap: 2 }}><b>{c.name}</b><span className="subtle">{c.highlight || '—'} · {c.bookIds.length} livros</span></div>
+              <div className="stack" style={{ gap: 2 }}><b>{c.name}</b><span className="subtle">{c.highlight ? `${c.highlight} ` : ''}{c.bookIds.length} livros</span></div>
               <label className="check"><input type="checkbox" checked={c.active} onChange={() => toggleCatalog(c)} /> visível</label>
             </div>
           ))}

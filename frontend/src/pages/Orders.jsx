@@ -18,7 +18,6 @@ export default function Orders() {
   return (
     <div className="container page">
       <div className="listing-head">
-        <span className="eyebrow">Sua conta</span>
         <h1>Minhas compras</h1>
         <p>Acompanhe pagamentos, envios e o histórico dos seus pedidos.</p>
       </div>
@@ -28,26 +27,26 @@ export default function Orders() {
         ))}
       </div>
       {loading && !data ? (
-        <div className="stack">{[0, 1, 2].map((i) => <div key={i} className="skeleton" style={{ height: 104, borderRadius: 20 }} />)}</div>
+        <div className="stack">{[0, 1, 2].map((i) => <div key={i} className="skeleton" style={{ height: 96 }} />)}</div>
       ) : data?.items.length ? (
-        <div className="stack" style={{ gap: 12 }}>
-          {data.items.map((o, i) => (
-            <Link key={o.code} to={`/compras/${o.code}`} className="order-card rise" style={{ '--i': i }}>
+        <div className="order-list">
+          {data.items.map((o) => (
+            <Link key={o.code} to={`/compras/${o.code}`} className="order-card">
               <div className="stack-covers">
                 {o.preview.slice(0, 3).map((it) => <BookCover key={it.bookId} title={it.title} style={it.coverStyle} showText={false} />)}
               </div>
               <div className="stack" style={{ gap: 6, minWidth: 0 }}>
                 <div className="row wrap" style={{ gap: 10 }}><b className="mono">{o.code}</b><OrderBadge status={o.status} /></div>
                 <span className="muted" style={{ fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {o.preview.map((it) => it.title).join(' · ')}
+                  {o.preview.map((it) => it.title).join(', ')}
                 </span>
                 <span className="subtle">
-                  {date(o.placedAt)} · {plural(o.itemCount, 'livro', 'livros')}{o.paymentMethod ? ` · ${PAYMENT_METHOD[o.paymentMethod]}` : ''}
-                  {o.shipmentStatus && o.status !== 'DELIVERED' && o.status !== 'CANCELED' ? ` · ${SHIPMENT_STATUS[o.shipmentStatus]}` : ''}
-                  {o.estimatedDelivery && (o.status === 'PAID' || o.status === 'SHIPPED') ? ` · chega até ${longDay(o.estimatedDelivery)}` : ''}
+                  Feito em {date(o.placedAt)}, {plural(o.itemCount, 'livro', 'livros')}{o.paymentMethod ? `, ${o.paymentMethod === 'PIX' ? 'Pix' : PAYMENT_METHOD[o.paymentMethod].toLowerCase()}` : ''}.
+                  {o.shipmentStatus && o.status !== 'DELIVERED' && o.status !== 'CANCELED' ? ` ${SHIPMENT_STATUS[o.shipmentStatus]}` : ''}
+                  {o.estimatedDelivery && (o.status === 'PAID' || o.status === 'SHIPPED') ? `, chega até ${longDay(o.estimatedDelivery)}.` : ''}
                 </span>
               </div>
-              <div className="row" style={{ gap: 14 }}><b style={{ fontSize: 17 }}>{money(o.total)}</b><ChevronRight size={18} className="muted" /></div>
+              <div className="row" style={{ gap: 14 }}><b className="num" style={{ fontSize: 17 }}>{money(o.total)}</b><ChevronRight size={18} className="muted" /></div>
             </Link>
           ))}
           <Pager page={data.page} totalPages={data.totalPages} onPage={(p) => setParams({ ...(status ? { status } : {}), pagina: p })} />

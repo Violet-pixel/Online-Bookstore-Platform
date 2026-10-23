@@ -64,8 +64,8 @@ export default function Account() {
           <Link to="/compras"><Package size={16} /> Minhas compras</Link>
         </nav>
         <div className="stack" style={{ gap: 22 }}>
-          <div><span className="eyebrow">Minha conta</span><h1 style={{ marginTop: 8 }}>Olá, {user.fullName.split(' ')[0]}</h1></div>
-          <section id="dados" className="card rise">
+          <div><h1>Minha conta</h1><p className="muted" style={{ marginTop: 8 }}>Dados, endereços de entrega e senha de {user.fullName.split(' ')[0]}.</p></div>
+          <section id="dados" className="card">
             <h3 style={{ marginBottom: 16 }}>Seus dados</h3>
             <form className="stack" style={{ gap: 14 }} onSubmit={saveProfile}>
               <div className="grid-2">
@@ -76,7 +76,7 @@ export default function Account() {
               <div><button type="submit" className="btn btn-dark" disabled={busy === 'profile'}>{busy === 'profile' && <Spinner />} Salvar</button></div>
             </form>
           </section>
-          <section id="enderecos" className="card rise" style={{ '--i': 1 }}>
+          <section id="enderecos" className="card">
             <div className="panel-title"><h3>Endereços</h3>{editing === null && <button type="button" className="btn btn-sm" onClick={() => setEditing('new')}><Plus size={14} /> Novo endereço</button>}</div>
             <div className="stack" style={{ gap: 10 }}>
               {editing === 'new' && <AddressForm onSubmit={saveAddress} onCancel={() => setEditing(null)} />}
@@ -86,8 +86,8 @@ export default function Account() {
                 <div key={a.id} className="addr fade">
                   <div className="stack" style={{ gap: 2 }}>
                     <b>{a.label} {a.isDefault && <span className="badge rose" style={{ marginLeft: 6 }}>principal</span>}</b>
-                    <span className="muted" style={{ fontSize: 14 }}>{a.street}, {a.streetNumber}{a.complement ? ` · ${a.complement}` : ''} · {a.district} · {a.city}/{a.state}</span>
-                    <span className="subtle">CEP {a.zipCode} · {a.recipient}</span>
+                    <span className="muted" style={{ fontSize: 14 }}>{a.street}, {a.streetNumber}{a.complement ? `, ${a.complement}` : ''}, {a.district}, {a.city}/{a.state}</span>
+                    <span className="subtle">CEP {a.zipCode}. Recebe: {a.recipient}</span>
                   </div>
                   <div className="row" style={{ gap: 4 }}>
                     <button type="button" className="btn btn-ghost btn-icon btn-sm" aria-label="Editar" onClick={() => setEditing(a.id)}><Pencil size={15} /></button>
@@ -98,7 +98,7 @@ export default function Account() {
               {addresses.data?.length === 0 && editing === null && <p className="muted">Nenhum endereço cadastrado.</p>}
             </div>
           </section>
-          <section id="senha" className="card rise" style={{ '--i': 2 }}>
+          <section id="senha" className="card">
             <h3 style={{ marginBottom: 16 }}>Trocar senha</h3>
             <form className="stack" style={{ gap: 14 }} onSubmit={savePassword}>
               <div className="grid-2">
