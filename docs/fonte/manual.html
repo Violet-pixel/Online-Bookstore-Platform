@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Prelo, manual técnico</title>
+<meta name="author" content="Clara Portes">
+<meta name="description" content="Manual técnico do Prelo, livraria online">
+<meta name="dcterms.created" content="2026-10-26">
+<link rel="stylesheet" href="base.css">
+<style>
+  .feature-list { margin: 2mm 0 4mm; }
+  .feature-list .item { padding: 1.8mm 0; border-bottom: 0.5pt solid var(--line); break-inside: avoid; }
+  .feature-list .item b { display: block; font-family: var(--serif); font-weight: 600; font-size: 10pt; }
+  .swatches { display: flex; gap: 2mm; margin: 2mm 0 4mm; }
+  .sw { flex: 1; font-size: 7.6pt; line-height: 1.35; }
+  .sw .chip { height: 14mm; border-radius: 1.4mm; border: 0.5pt solid rgba(0,0,0,.08); margin-bottom: 1.6mm; }
+  .sw b { display: block; font-size: 8.2pt; }
+  .sw .hex { font-family: var(--mono); font-size: 7pt; color: var(--muted); display: block; margin-bottom: 0.6mm; }
+  .voices { display: flex; gap: 4mm; margin: 2mm 0 4mm; }
+  .voice { flex: 1; border-top: 0.8pt solid var(--ink); padding-top: 2mm; }
+  .voice .sample { font-size: 20pt; line-height: 1.1; margin: 1mm 0 1.6mm; }
+  .voice.serif .sample { font-family: var(--serif); font-weight: 600; }
+  .voice.sans .sample { font-family: var(--font); font-weight: 600; }
+  .voice.mono .sample { font-family: var(--mono); font-size: 14pt; padding-top: 2.4mm; }
+  .voice p { font-size: 7.8pt; color: var(--ink-2); }
+  .flow { display: flex; gap: 1.6mm; margin: 2mm 0 4mm; }
+  .flow div { flex: 1; background: var(--papel); padding: 2mm 2.4mm; font-size: 7.6pt; line-height: 1.35; border-top: 1.6pt solid var(--malva); border-radius: 0 0 1.2mm 1.2mm; }
+  .flow div b { display: block; font-size: 8pt; color: var(--malva); margin-bottom: 0.8mm; }
+  ol.steps { padding-left: 6mm; }
+  ol.steps li::marker { font-weight: 650; }
+</style>
+</head>
+<body>
+<span class="doc-title">manual técnico</span><span class="doc-version">Versão 1.1.0, interface de outubro de 2026</span>
+
+<!-- ===================== CAPA ===================== -->
+<div class="cover">
+  <div class="mark"><svg viewBox="0 0 120 120"><rect width="120" height="120" rx="28" fill="#EAEAEA"/><rect x="26" y="74" width="68" height="16" rx="4" fill="#212121"/><rect x="82" y="74" width="4" height="16" fill="#EAEAEA" opacity=".5"/><rect x="32" y="56" width="58" height="16" rx="4" fill="#B86B84"/><rect x="38" y="56" width="4" height="16" fill="#EAEAEA" opacity=".5"/><rect x="28" y="38" width="60" height="16" rx="4" fill="#E0B94F" transform="rotate(-6 58 46)"/><circle cx="72" cy="26" r="5" fill="#B86B84"/></svg></div>
+  <h1>Prelo</h1>
+  <div class="sub">Manual técnico do projeto</div>
+  <div class="desc">Livraria online com vitrine, catálogos, busca, Quero ler, carrinho, checkout, pagamentos e rastreio de envio. Java 21, Spring Boot, JPA, Spring Security, Flyway, Redis e React, sobre PostgreSQL, MySQL, SQL Server ou Oracle.</div>
+  <div class="shelf">
+    <span style="width:7mm;height:52mm;background:#76805A"></span><span style="width:9mm;height:62mm;background:#2B2A33"></span><span style="width:6mm;height:48mm;background:#3F5F4B"></span><span style="width:8mm;height:58mm;background:#8E3B59"></span><span style="width:10mm;height:66mm;background:#E0B94F"></span><span style="width:6mm;height:54mm;background:#4E6178"></span><span style="width:8mm;height:60mm;background:#EFE9DF"></span><span style="width:7mm;height:50mm;background:#9C4A3C"></span><span style="width:11mm;height:64mm;background:#4A3956"></span><span style="width:6mm;height:46mm;background:#B86B84"></span><span style="width:8mm;height:58mm;background:#211F22"></span><span style="width:9mm;height:62mm;background:#D9D0C1"></span><span style="width:6mm;height:52mm;background:#3F5F4B"></span><span style="width:8mm;height:60mm;background:#E0B94F"></span><span style="width:7mm;height:56mm;background:#8E3B59"></span><span style="width:10mm;height:64mm;background:#2B2A33"></span><span style="width:6mm;height:48mm;background:#76805A"></span><span style="width:8mm;height:58mm;background:#4E6178"></span>
+  </div>
+  <div class="plank"></div>
+  <div class="foot">
+    <div><div class="author">Clara Portes</div>Copyright (©) 2026 Clara Portes. Licença MIT.</div>
+    <div class="right">Versão 1.1.0, interface de outubro de 2026<br>Rio de Janeiro, pt-BR</div>
+  </div>
+</div>
+
+<!-- ===================== SUMÁRIO ===================== -->
+<div class="toc-page">
+  <h2>Sumário</h2>
+  <nav class="toc"><ol>
+    <li class="ch"><a href="#ch-geral"><span class="n">1</span>Visão geral</a></li>
+    <li class="sub"><a href="#s-serve">Para que serve</a></li>
+    <li class="sub"><a href="#s-faz">O que o Prelo faz</a></li>
+    <li class="sub"><a href="#s-tec">Tecnologias</a></li>
+    <li class="sub"><a href="#s-identidade">Identidade visual</a></li>
+    <li class="sub"><a href="#s-novidades">Novidades da interface</a></li>
+    <li class="ch"><a href="#ch-rodar"><span class="n">2</span>Como rodar</a></li>
+    <li class="sub"><a href="#s-req">Requisitos</a></li>
+    <li class="sub"><a href="#s-primeira">Primeira execução</a></li>
+    <li class="sub"><a href="#s-banco">Escolher o banco</a></li>
+    <li class="sub"><a href="#s-demo">Contas de demonstração</a></li>
+    <li class="sub"><a href="#s-dia">Comandos do dia a dia</a></li>
+    <li class="sub"><a href="#s-real">Usar com dados reais</a></li>
+    <li class="sub"><a href="#s-semdocker">Rodar sem Docker</a></li>
+    <li class="sub"><a href="#s-rede">Acesso pela rede e HTTPS</a></li>
+    <li class="ch"><a href="#ch-telas"><span class="n">3</span>Guia das telas</a></li>
+    <li class="sub"><a href="#t-vitrine">Vitrine</a></li>
+    <li class="sub"><a href="#t-busca">Busca e catálogo</a></li>
+    <li class="sub"><a href="#t-categorias">Categorias, catálogos e autoria</a></li>
+    <li class="sub"><a href="#t-livro">Página do livro</a></li>
+    <li class="sub"><a href="#t-querler">Quero ler</a></li>
+    <li class="sub"><a href="#t-carrinho">Carrinho</a></li>
+    <li class="sub"><a href="#t-entrar">Entrar e criar conta</a></li>
+    <li class="sub"><a href="#t-checkout">Checkout</a></li>
+    <li class="sub"><a href="#t-pagamento">Janela de pagamento</a></li>
+    <li class="sub"><a href="#t-compras">Minhas compras</a></li>
+    <li class="sub"><a href="#t-pedido">Detalhes do pedido e do envio</a></li>
+    <li class="sub"><a href="#t-conta">Minha conta</a></li>
+    <li class="sub"><a href="#t-escuro">Tema escuro, celular e atalhos</a></li>
+    <li class="ch"><a href="#ch-admin"><span class="n">4</span>Administração</a></li>
+    <li class="sub"><a href="#a-painel">Painel</a></li>
+    <li class="sub"><a href="#a-pedidos">Pedidos e envios</a></li>
+    <li class="sub"><a href="#a-livros">Livros e estoque</a></li>
+    <li class="sub"><a href="#a-catalogo">Categorias e catálogos</a></li>
+    <li class="ch"><a href="#ch-pag"><span class="n">5</span>Pagamentos e envio</a></li>
+    <li class="sub"><a href="#p-sandbox">Sandbox e cartões de teste</a></li>
+    <li class="sub"><a href="#p-cartao">Como o cartão é protegido</a></li>
+    <li class="sub"><a href="#p-idem">Idempotência</a></li>
+    <li class="sub"><a href="#p-real">Plugar um provedor real</a></li>
+    <li class="sub"><a href="#p-frete">Frete</a></li>
+    <li class="sub"><a href="#p-prazos">Prazos e cancelamento automático</a></li>
+    <li class="sub"><a href="#p-cupons">Cupons</a></li>
+    <li class="ch"><a href="#ch-arq"><span class="n">6</span>Arquitetura</a></li>
+    <li class="sub"><a href="#r-pacotes">Pacotes da API</a></li>
+    <li class="sub"><a href="#r-interface">Interface</a></li>
+    <li class="sub"><a href="#r-seg">Segurança</a></li>
+    <li class="sub"><a href="#r-redis">Redis</a></li>
+    <li class="sub"><a href="#r-pastas">Estrutura de pastas</a></li>
+    <li class="ch"><a href="#ch-api"><span class="n">7</span>API REST</a></li>
+    <li class="sub"><a href="#i-auth">Autenticação</a></li>
+    <li class="sub"><a href="#i-rotas">Rotas principais</a></li>
+    <li class="sub"><a href="#i-ex">Exemplos</a></li>
+    <li class="sub"><a href="#i-erros">Erros</a></li>
+    <li class="ch"><a href="#ch-cfg"><span class="n">8</span>Configuração</a></li>
+    <li class="sub"><a href="#c-app">Aplicação</a></li>
+    <li class="sub"><a href="#c-banco">Banco e Redis</a></li>
+    <li class="sub"><a href="#c-pag">Pagamentos</a></li>
+    <li class="sub"><a href="#c-prod">Checklist para produção</a></li>
+    <li class="ch"><a href="#ch-testes"><span class="n">9</span>Testes e integração contínua</a></li>
+    <li class="sub"><a href="#x-api">Testes da API</a></li>
+    <li class="sub"><a href="#x-ui">Testes da interface</a></li>
+    <li class="sub"><a href="#x-ci">Integração contínua</a></li>
+    <li class="sub"><a href="#x-pdf">Gerar estes manuais</a></li>
+    <li class="ch"><a href="#ch-prob"><span class="n">10</span>Solução de problemas</a></li>
+  </ol></nav>
+</div>
+
+<!-- ===================== 1. VISÃO GERAL ===================== -->
+<section class="chapter" id="ch-geral">
+  <div class="chapter-head"><div class="num">Capítulo 1</div><h2>Visão geral</h2>
+    <p class="lede">O Prelo é uma livraria online: vitrine, busca, carrinho, frete, pagamento com cartão, Pix ou boleto e o rastreio de cada envio. A livraria tem um painel para cuidar de pedidos, estoque e vitrines.</p></div>
+
+  <h3 id="s-serve">Para que serve</h3>
+  <p>É uma base de e-commerce em Java. Dá para usar como está numa livraria pequena, estudar como referência de arquitetura (camadas, segurança, cache, concorrência de estoque, idempotência de pagamento) ou adaptar para outro tipo de loja. O mesmo código roda em PostgreSQL, MySQL, SQL Server ou Oracle; para trocar, basta mudar uma variável.</p>
+
+  <h3 id="s-faz">O que o Prelo faz</h3>
+  <div class="feature-list">
+    <div class="item"><b>Vitrine e estantes</b>A vitrine abre com uma estante de lombadas dos livros mais vendidos. Vitrines curadas com ordem própria (Mais vendidos, Lançamentos, Clássicos essenciais, Para programar melhor, Leituras de fim de semana) e oito categorias com contagem de livros, sempre a um clique na barra de estantes.</div>
+    <div class="item"><b>Busca</b>Por título, subtítulo, autor, editora e ISBN, sem diferenciar acentos nem maiúsculas. Sugestões enquanto você digita, buscas recentes, filtros de categoria, formato, preço e estoque, seis ordenações e paginação.</div>
+    <div class="item"><b>Página do livro</b>Capa gerada pela interface, sinopse, ficha catalográfica, estoque, tempo estimado de leitura, cálculo de frete pelo CEP, link para a página da autoria e livros da mesma estante.</div>
+    <div class="item"><b>Quero ler</b>Marcador em cada livro. A lista fica no navegador e avisa quando o preço baixa ou o livro volta ao estoque.</div>
+    <div class="item"><b>Carrinho</b>Funciona sem login (fica no navegador) e é somado ao da conta quando você entra. Tem gaveta lateral, barra de frete grátis e cupons.</div>
+    <div class="item"><b>Checkout</b>Endereço preenchido pelo CEP, três formas de envio com preço e prazo por região, cupom e reserva do estoque por 60 minutos.</div>
+    <div class="item"><b>Janela de pagamento</b>Cartão de crédito em até 6x sem juros, Pix com QR Code e copia e cola, boleto com linha digitável. O modo sandbox permite testar tudo sem dinheiro.</div>
+    <div class="item"><b>Compras e envio</b>Filtros por status, barra de progresso, código de rastreio, previsão de entrega, linha do tempo do pacote, comprar de novo e comprovante para imprimir.</div>
+    <div class="item"><b>Administração</b>Painel de vendas, pedidos e envios, livros e estoque, categorias e catálogos, com exportação em CSV.</div>
+    <div class="item"><b>Interface</b>Tema claro e escuro, layout para celular, atalhos de teclado e transições curtas que mostram o resultado de cada ação.</div>
+  </div>
+
+  <h3 id="s-tec">Tecnologias</h3>
+  <table>
+    <thead><tr><th>Camada</th><th>Tecnologia</th><th>Papel</th></tr></thead>
+    <tbody>
+      <tr><td>API</td><td>Java 21, Spring Boot 4.1, Spring MVC</td><td>Rotas REST, validação, documentação OpenAPI (Swagger)</td></tr>
+      <tr><td>Segurança</td><td>Spring Security 7, JWT (Nimbus, HS256), BCrypt</td><td>Login, sessão sem estado, papéis CUSTOMER e ADMIN</td></tr>
+      <tr><td>Persistência</td><td>Spring Data JPA, Hibernate 7</td><td>Entidades, consultas, paginação, bloqueio otimista</td></tr>
+      <tr><td>Migrações</td><td>Flyway 12</td><td>Uma pasta por banco em <code>db/migration/{banco}</code></td></tr>
+      <tr><td>Bancos</td><td>PostgreSQL, MySQL, SQL Server, Oracle</td><td>Fonte da verdade: contas, catálogo, pedidos, pagamentos, envios</td></tr>
+      <tr><td>Cache e tokens</td><td>Redis 7 (Lettuce)</td><td>Cache do catálogo, sessões, tokens de cartão, limite de login, travas</td></tr>
+      <tr><td>Interface</td><td>React 19, React Router 7, Vite</td><td>Loja, checkout, compras, conta e administração</td></tr>
+      <tr><td>Entrega</td><td>nginx, Docker Compose</td><td>Serve a interface, repassa <code>/api</code> e sobe tudo com um comando</td></tr>
+      <tr><td>Testes</td><td>JUnit 5, MockMvc, Vitest, GitHub Actions</td><td>Integração nos quatro bancos e componentes da interface</td></tr>
+      <tr><td>Manuais</td><td>HTML, CSS e WeasyPrint</td><td>Estes PDFs, gerados a partir de <code>docs/fonte/</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="s-identidade">Identidade visual</h3>
+  <p>A marca é a Pilha: três livros empilhados (grafite, malva e mostarda) com um ponto malva no alto, como quem acabou de pôr mais um na pilha. O nome vem da expressão <em>no prelo</em>, usada para o livro que está para sair da gráfica.</p>
+  <p>A interface parte da própria marca e do objeto livro. A vitrine é uma estante de lombadas; as capas geradas imitam capas de tecido e papel, com etiqueta colada, faixa, moldura, régua e o vinco da lombada; a página do livro traz a ficha catalográfica como a do verso da folha de rosto. As cores saem do logo:</p>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#F4F2EF"></div><b>Papel</b><span class="hex">#F4F2EF</span>Fundo das páginas</div>
+    <div class="sw"><div class="chip" style="background:#211F22"></div><b>Grafite</b><span class="hex">#211F22</span>Texto e tinta</div>
+    <div class="sw"><div class="chip" style="background:#8E3B59"></div><b>Malva</b><span class="hex">#8E3B59</span>Ações principais e links</div>
+    <div class="sw"><div class="chip" style="background:#B86B84"></div><b>Malva do logo</b><span class="hex">#B86B84</span>Logo e categorias</div>
+    <div class="sw"><div class="chip" style="background:#E0B94F"></div><b>Mostarda</b><span class="hex">#E0B94F</span>Etiqueta de preço e avisos</div>
+  </div>
+  <p>A tipografia é a mesma do Lume, servida pelo próprio projeto:</p>
+  <div class="voices">
+    <div class="voice serif"><div class="sample">Literata</div><p>Títulos, nomes de livros, sinopse e preço grande. Uma serifa feita para leitura longa.</p></div>
+    <div class="voice sans"><div class="sample">Public Sans</div><p>Texto corrido, botões, formulários e tabelas. Algarismos tabulares nos preços.</p></div>
+    <div class="voice mono"><div class="sample">IBM Plex Mono</div><p>Só para identificadores (ISBN, pedido, rastreio, CEP, cupom) e para a ficha catalográfica.</p></div>
+  </div>
+  <p>O tema escuro usa fundo <code>#19171A</code>, texto <code>#EEEAEC</code> e uma malva mais clara (<code>#DB8CA6</code>) para manter o contraste. As capas dos livros são geradas pela interface, em doze combinações, sem nenhuma imagem de terceiros.</p>
+
+  <h3 id="s-novidades">Novidades da interface</h3>
+  <p>Esta rodada muda só a interface. Rotas, API, banco e regras de negócio são as mesmas da 1.1.0.</p>
+  <ul>
+    <li>Identidade nova: estante de lombadas na vitrine, capas de tecido e papel, paleta do logo e tipografia do Lume (Literata, Public Sans e IBM Plex Mono) no lugar da Gloock e da Libre Franklin.</li>
+    <li>Barra de estantes sob o cabeçalho, com Todos os livros, Lançamentos, Mais vendidos e as oito categorias.</li>
+    <li>Busca com sugestões enquanto você digita, navegação pelas setas e buscas recentes.</li>
+    <li>Quero ler, com aviso de queda de preço e de volta ao estoque.</li>
+    <li>Página de cada pessoa autora, vistos por último, tempo de leitura, compartilhamento e ficha catalográfica no livro.</li>
+    <li>Comprar de novo e comprovante para imprimir no pedido; atalhos de teclado em toda a loja.</li>
+    <li>Na administração, exportação em CSV de pedidos e de livros e filtros de estoque baixo, esgotados e fora da loja.</li>
+    <li>Correção: a rolagem ao trocar de página e o menu da conta quebravam em navegadores em que <code>window.scrollTo</code> devolve uma Promise.</li>
+    <li>Todas as capturas de tela deste manual foram refeitas, e o HTML destes PDFs agora fica no repositório, em <code>docs/fonte/</code>.</li>
+  </ul>
+</section>
+
+<!-- ===================== 2. COMO RODAR ===================== -->
+<section class="chapter" id="ch-rodar">
+  <div class="chapter-head"><div class="num">Capítulo 2</div><h2>Como rodar</h2>
+    <p class="lede">Com Docker, o Prelo sobe com um comando. Os scripts criam o arquivo de configuração com senhas aleatórias, constroem as imagens e abrem o navegador quando tudo estiver pronto.</p></div>
+
+  <h3 id="s-req">Requisitos</h3>
+  <ul>
+    <li>Docker com Docker Compose (Docker Desktop no Windows e no macOS).</li>
+    <li>Cerca de 3 GB de memória livre (4 GB para Oracle ou SQL Server) e 3 GB de disco para as imagens.</li>
+    <li>Na primeira vez, acesso à internet para baixar as imagens e as dependências do Maven e do npm.</li>
+  </ul>
+
+  <h3 id="s-primeira">Primeira execução</h3>
+  <h4>Windows</h4>
+  <p>Dê dois cliques em <code>iniciar.cmd</code>, na pasta do projeto.</p>
+  <h4>Linux ou macOS</h4>
+  <pre>./iniciar.sh</pre>
+  <p>Os dois scripts fazem a mesma coisa:</p>
+  <ol class="steps">
+    <li>Conferem se o Docker está instalado.</li>
+    <li>Na primeira vez, copiam <code>.env.example</code> para <code>.env</code> e trocam <code>DB_PASSWORD</code> e <code>JWT_SECRET</code> por valores aleatórios.</li>
+    <li>Ajustam <code>COMPOSE_PROFILES</code> para o banco escolhido em <code>DB_VENDOR</code>.</li>
+    <li>Rodam <code>docker compose up -d --build</code>, que sobe o banco, o Redis, a API e a interface.</li>
+    <li>Esperam <code>/api/health</code> responder e abrem http://localhost:8080.</li>
+  </ol>
+  <table>
+    <thead><tr><th>Endereço</th><th>O que é</th></tr></thead>
+    <tbody>
+      <tr><td><code>http://localhost:8080</code></td><td>Loja e administração</td></tr>
+      <tr><td><code>http://localhost:8080/api/docs</code></td><td>Documentação interativa da API (Swagger)</td></tr>
+      <tr><td><code>http://localhost:8080/api/health</code></td><td>Saúde da API, do banco e do Redis (usada pelos scripts)</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="s-banco">Escolher o banco</h3>
+  <p>O banco é definido no <code>.env</code>. Os dois valores precisam ser iguais; os scripts corrigem <code>COMPOSE_PROFILES</code> sozinhos.</p>
+  <pre>DB_VENDOR=sqlserver
+COMPOSE_PROFILES=sqlserver</pre>
+  <table>
+    <thead><tr><th>Valor</th><th>Imagem usada</th><th>Primeira subida</th></tr></thead>
+    <tbody>
+      <tr><td><code>postgresql</code></td><td>postgres:16-alpine</td><td>segundos</td></tr>
+      <tr><td><code>mysql</code></td><td>mysql:8.4</td><td>cerca de 30 s</td></tr>
+      <tr><td><code>sqlserver</code></td><td>mssql/server:2022 (edição Developer)</td><td>1 a 2 min; um contêiner auxiliar cria o banco e o login</td></tr>
+      <tr><td><code>oracle</code></td><td>gvenzl/oracle-free:23-slim-faststart</td><td>1 a 3 min; o usuário da aplicação é criado no FREEPDB1</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><b class="t">Trocar de banco</b>Cada banco guarda os dados no próprio volume. Trocar <code>DB_VENDOR</code> começa uma loja nova (com os dados de demonstração, se ligados); voltar ao banco anterior traz os dados dele de volta.</div>
+
+  <h3 id="s-demo">Contas de demonstração</h3>
+  <p>Num banco vazio, com <code>APP_SEED_DEMO=true</code>, o Prelo cria 37 livros, 8 categorias, 5 catálogos, 3 cupons, quatro contas e seis pedidos em etapas diferentes (entregue, a caminho, saiu para entrega, em separação e aguardando boleto). Nomes, e-mails, endereços, editoras, preços e ISBNs são fictícios.</p>
+  <table>
+    <thead><tr><th>Papel</th><th>E-mail</th><th>Senha</th><th>O que pode fazer</th></tr></thead>
+    <tbody>
+      <tr><td>Cliente</td><td><code>leitora@prelo.dev</code></td><td><code>Prelo@2026</code></td><td>Comprar, pagar, acompanhar pedidos, gerenciar endereços</td></tr>
+      <tr><td>Administração</td><td><code>admin@prelo.dev</code></td><td><code>Prelo@2026</code></td><td>Tudo, incluindo painel, pedidos, envios, livros e vitrines</td></tr>
+    </tbody>
+  </table>
+  <p>Cupons de demonstração: <code>BEMVINDO10</code> (10%), <code>LEIA20</code> (R$ 20 acima de R$ 150) e <code>CLASSICOS15</code> (15% acima de R$ 100).</p>
+
+  <h3 id="s-dia">Comandos do dia a dia</h3>
+  <table>
+    <thead><tr><th>Para</th><th>Comando</th></tr></thead>
+    <tbody>
+      <tr><td>Ver os logs da API</td><td><code>docker compose logs -f api</code></td></tr>
+      <tr><td>Parar (os dados ficam nos volumes)</td><td><code>docker compose down</code></td></tr>
+      <tr><td>Atualizar depois de baixar uma versão nova</td><td><code>docker compose up -d --build</code></td></tr>
+      <tr><td>Abrir o terminal do banco (PostgreSQL)</td><td><code>docker compose exec postgresql psql -U prelo</code></td></tr>
+      <tr><td>Abrir o terminal do Redis</td><td><code>docker compose exec redis redis-cli</code></td></tr>
+      <tr><td>Apagar tudo, inclusive os dados</td><td><code>docker compose down -v</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="s-real">Usar com dados reais</h3>
+  <ol class="steps">
+    <li>No <code>.env</code>, defina <code>APP_SEED_DEMO=false</code> antes da primeira subida (ou apague os volumes com <code>docker compose down -v</code>).</li>
+    <li>Se não for testar pagamentos simulados, defina <code>PAYMENTS_SANDBOX=false</code> e implemente um provedor real (capítulo 5).</li>
+    <li>Suba o projeto e crie a sua conta pela tela Criar conta.</li>
+    <li>Promova a sua conta a administração direto no banco. O comando é o mesmo nos quatro:</li>
+  </ol>
+  <pre>UPDATE app_user SET user_role = 'ADMIN' WHERE email = 'voce@sualivraria.com.br';</pre>
+  <p>Depois, saia e entre de novo para o novo papel valer no token.</p>
+
+  <h3 id="s-semdocker">Rodar sem Docker</h3>
+  <p>Útil para desenvolver. Você precisa de Java 21, Maven 3.9, Node 22, Redis 7 e um dos quatro bancos com um banco <code>prelo</code> e um usuário <code>prelo</code>.</p>
+  <pre># API na porta 8081 (PostgreSQL local por padrão)
+cd backend
+DB_PASSWORD=prelo JWT_SECRET=troque-por-uma-chave-com-32-caracteres mvn spring-boot:run
+
+# outro banco
+DB_VENDOR=mysql DB_HOST=127.0.0.1 DB_PASSWORD=prelo mvn spring-boot:run
+
+# interface na porta 5173 (repassa /api para a 8081)
+cd frontend &amp;&amp; npm install &amp;&amp; npm run dev</pre>
+
+  <h3 id="s-rede">Acesso pela rede e HTTPS</h3>
+  <table class="cfg">
+    <thead><tr><th>Variável</th><th colspan="2">Quando mexer</th></tr></thead>
+    <tbody>
+      <tr><td>APP_PORT</td><td colspan="2">Para publicar em outra porta (padrão 8080).</td></tr>
+      <tr><td>APP_HTTPS</td><td colspan="2"><code>true</code> atrás de um proxy com HTTPS: o cookie de sessão passa a ser só HTTPS.</td></tr>
+      <tr><td>APP_CORS_ORIGINS</td><td colspan="2">Endereços que podem chamar a API de outro domínio. A interface do próprio projeto não precisa.</td></tr>
+      <tr><td>API_DOCS_ENABLED</td><td colspan="2"><code>false</code> desliga o Swagger em produção.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===================== 3. TELAS ===================== -->
+<section class="chapter" id="ch-telas">
+  <div class="chapter-head"><div class="num">Capítulo 3</div><h2>Guia das telas</h2>
+    <p class="lede">O que cada tela mostra e como usar. Todas funcionam no tema claro e no escuro e se adaptam ao celular.</p></div>
+
+  <h3 id="t-vitrine">Vitrine</h3>
+  <figure><img src="../images/tela-vitrine.png"><figcaption><b>Figura 1</b> Vitrine com a estante de lombadas e a barra de estantes.</figcaption></figure>
+  <dl class="def">
+    <div class="item"><dt>Estante</dt><dd>As lombadas dos livros mais vendidos. A largura vem do número de páginas e a altura, do formato (bolso, brochura, capa dura). Passe o mouse, use Tab ou toque numa lombada: ela sobe e a legenda embaixo mostra título, autoria e preço. Clique para abrir o livro.</dd></div>
+    <div class="item"><dt>Barra de estantes</dt><dd>Logo abaixo do cabeçalho, em todas as telas da loja: Todos os livros, Lançamentos, Mais vendidos e as oito categorias, cada uma com a sua cor.</dd></div>
+    <div class="item"><dt>Benefícios</dt><dd>Frete grátis acima de R$ 199, formas de pagamento e cancelamento antes do envio, numa linha só.</dd></div>
+    <div class="item"><dt>Catálogos em trilhos</dt><dd>Cada catálogo curado vira um trilho horizontal. Use as setas, arraste no celular ou clique em Ver tudo.</dd></div>
+    <div class="item"><dt>Estantes e cupom</dt><dd>Blocos levam a cada categoria; a faixa escura mostra o cupom de 10% na primeira compra.</dd></div>
+    <div class="item"><dt>Vistos por último</dt><dd>Aparece quando você já abriu dois livros ou mais; Limpar apaga a lista.</dd></div>
+  </dl>
+  <figure><img src="../images/tela-vitrine-trilhos.png"><figcaption><b>Figura 2</b> Trilhos dos catálogos. Em cada capa, o marcador guarda o livro em Quero ler e o botão + põe no carrinho sem sair da vitrine.</figcaption></figure>
+
+  <h3 id="t-busca">Busca e catálogo</h3>
+  <figure><img src="../images/tela-sugestoes.png"><figcaption><b>Figura 3</b> Sugestões enquanto você digita, com capa, autoria e preço.</figcaption></figure>
+  <p>A caixa no topo está em todas as telas. Aperte <kbd>/</kbd> para ir direto a ela. A partir da segunda letra aparecem até seis livros com capa, autoria e preço; as setas escolhem, Enter abre e Esc fecha. Sem nada digitado, a lista mostra as cinco últimas buscas. Enter sem escolher uma sugestão leva à lista completa.</p>
+  <figure><img src="../images/tela-catalogo.png"><figcaption><b>Figura 4</b> Todos os livros, com filtros à esquerda e ordenação.</figcaption></figure>
+  <p>A lista de livros tem os filtros à esquerda (categoria, formato, faixa de preço e só o que tem em estoque) e a ordenação à direita: mais vendidos, novidades, mais bem avaliados, menor preço, maior preço e título. Cada filtro ativo vira um selo que sai com um clique. A busca ignora acentos e maiúsculas: <em>memorias postumas</em> encontra Memórias Póstumas de Brás Cubas, e o ISBN funciona com ou sem hífens.</p>
+  <figure><img src="../images/tela-busca.png"><figcaption><b>Figura 5</b> Busca por autor.</figcaption></figure>
+
+  <h3 id="t-categorias">Categorias, catálogos e autoria</h3>
+  <figure><img src="../images/tela-categorias.png"><figcaption><b>Figura 6</b> Categorias com descrição e contagem, e os catálogos curados.</figcaption></figure>
+  <p>A página Categorias mostra as oito estantes com descrição e número de livros e, embaixo, a seção Catálogos. Um catálogo tem ordem própria, definida pela livraria. Ao abrir um catálogo, os livros aparecem nessa ordem, com os mesmos filtros da busca.</p>
+  <figure><img src="../images/tela-catalogo-curado.png"><figcaption><b>Figura 7</b> Catálogo curado Para programar melhor.</figcaption></figure>
+  <p>O nome de quem escreveu, na página do livro, leva à página da autoria, com todos os livros dela à venda, do mais novo ao mais antigo.</p>
+  <figure><img src="../images/tela-autor.png"><figcaption><b>Figura 8</b> Página da autoria.</figcaption></figure>
+
+  <h3 id="t-livro">Página do livro</h3>
+  <figure><img src="../images/tela-livro.png"><figcaption><b>Figura 9</b> Página do livro com preço, estoque, frete, sinopse e ficha catalográfica.</figcaption></figure>
+  <dl class="def">
+    <div class="item"><dt>Cabeçalho</dt><dd>Título, subtítulo, autoria (com link), nota, formato, páginas e o tempo estimado de leitura.</dd></div>
+    <div class="item"><dt>Preço</dt><dd>O de venda, o de capa riscado e o desconto. Abaixo, as parcelas sem juros (parcela mínima de R$ 30).</dd></div>
+    <div class="item"><dt>Estoque</dt><dd>Verde quando há bastante; mostarda com Restam N exemplares quando sobram 5 ou menos; vermelho quando esgotado, com a sugestão de guardar em Quero ler.</dd></div>
+    <div class="item"><dt>Compra</dt><dd>Escolha a quantidade (até 10 ou o estoque) e use Adicionar ao carrinho, ou Comprar agora, que já leva ao carrinho. O marcador guarda em Quero ler e o botão ao lado compartilha o link (ou copia, quando o navegador não compartilha).</dd></div>
+    <div class="item"><dt>Frete</dt><dd>Digite o CEP e veja preço e prazo das formas de envio para essa quantidade.</dd></div>
+    <div class="item"><dt>Ficha catalográfica</dt><dd>Autoria, título, editora, ano, páginas, formato, peso, ISBN, assunto e idioma, no formato da ficha impressa no verso da folha de rosto.</dd></div>
+    <div class="item"><dt>Da mesma estante</dt><dd>Livros da mesma categoria e, embaixo, os vistos por último.</dd></div>
+  </dl>
+
+  <h3 id="t-querler">Quero ler</h3>
+  <figure><img src="../images/tela-quero-ler.png"><figcaption><b>Figura 10</b> Quero ler com aviso de queda de preço e de volta ao estoque.</figcaption></figure>
+  <p>O marcador de cada capa guarda o livro em Quero ler, junto com o preço e o estoque daquele dia. Ao abrir a lista, a interface confere preço e estoque de hoje e mostra Baixou R$ X, Subiu R$ X, Voltou ao estoque ou Esgotado. O número ao lado de Quero ler no cabeçalho fica mostarda quando há novidades. Dá para ordenar, mover um livro para o carrinho ou pôr todos os disponíveis de uma vez.</p>
+  <div class="note"><b class="t">Fica no navegador</b>A lista é guardada neste navegador (não na conta), funciona sem login e não vai para outros aparelhos.</div>
+
+  <h3 id="t-carrinho">Carrinho</h3>
+  <div class="fig-pair">
+    <figure><img src="../images/tela-gaveta.png"><figcaption><b>Figura 11</b> Gaveta do carrinho com a barra de frete grátis.</figcaption></figure>
+    <figure><img src="../images/tela-carrinho.png"><figcaption><b>Figura 12</b> Carrinho com resumo, frete e cupom.</figcaption></figure>
+  </div>
+  <p>O ícone da sacola (ou a tecla <kbd>c</kbd>) abre a gaveta com os itens, a barra que mostra quanto falta para o frete grátis e o botão Ver carrinho e fechar pedido. A página Carrinho tem o resumo completo, a economia em relação ao preço de capa, a estimativa de frete e o campo de cupom. O botão Fechar pedido leva ao checkout; sem login, ele aparece como Entrar e fechar pedido.</p>
+  <p>Sem login, o carrinho fica no navegador. Ao entrar, ele é somado ao da conta, respeitando o estoque e o limite de 10 por título.</p>
+
+  <h3 id="t-entrar">Entrar e criar conta</h3>
+  <figure><img src="../images/tela-entrar.png"><figcaption><b>Figura 13</b> Tela de entrada com as contas de demonstração.</figcaption></figure>
+  <p>A entrada pede e-mail e senha; o link Criar conta pede também o nome. Na tela de entrada, um clique num e-mail de demonstração preenche o formulário. Depois de cinco senhas erradas seguidas, o e-mail fica bloqueado por 15 minutos.</p>
+
+  <h3 id="t-checkout">Checkout</h3>
+  <figure><img src="../images/tela-checkout.png"><figcaption><b>Figura 14</b> Checkout: endereço, forma de envio e resumo com cupom.</figcaption></figure>
+  <ol class="steps">
+    <li><b>Endereço:</b> escolha um dos seus endereços ou crie um novo. Ao digitar o CEP, rua, bairro, cidade e UF são preenchidos sozinhos (quando a consulta de CEP está disponível).</li>
+    <li><b>Envio:</b> Econômica (grátis acima de R$ 199), Expressa ou Retirada em ponto parceiro (grátis acima de R$ 99). Preço e prazo mudam com a região do CEP e o peso.</li>
+    <li><b>Resumo:</b> confira os itens, aplique o cupom e veja o total. Ir para o pagamento cria o pedido, reserva o estoque por 60 minutos e abre a janela de pagamento.</li>
+  </ol>
+
+  <h3 id="t-pagamento">Janela de pagamento</h3>
+  <p>A janela mostra o total e três abas. Ela pode ser fechada a qualquer momento: o pedido fica em Aguardando pagamento e o botão Pagar aparece de novo em Minhas compras.</p>
+  <figure class="narrow"><img src="../images/tela-pagamento-cartao.png"><figcaption><b>Figura 15</b> Cartão de crédito com parcelas e os cartões de teste do sandbox.</figcaption></figure>
+  <h4>Cartão de crédito</h4>
+  <p>O cartão desenhado acompanha o que você digita e reconhece a bandeira (Visa, Mastercard, Elo, Amex, Hipercard). Escolha as parcelas e clique em Pagar. Se o emissor recusar, o motivo aparece em vermelho e você pode tentar outro cartão sem perder o pedido.</p>
+  <div class="fig-pair">
+    <figure><img src="../images/tela-pagamento-pix.png"><figcaption><b>Figura 16</b> Pix com QR Code, copia e cola e contagem regressiva.</figcaption></figure>
+    <figure><img src="../images/tela-pagamento-boleto.png"><figcaption><b>Figura 17</b> Boleto com linha digitável e vencimento.</figcaption></figure>
+  </div>
+  <h4>Pix</h4>
+  <p>Gerar QR Code Pix mostra o QR Code, o código copia e cola e um relógio de 30 minutos. A janela consulta o pagamento a cada 3 segundos e passa sozinha para a confirmação quando ele cai.</p>
+  <h4>Boleto</h4>
+  <p>Gerar boleto mostra a linha digitável e o vencimento (3 dias úteis). O prazo do pedido se estende até o vencimento, e os livros saem depois da compensação. Pix e boleto podem existir ao mesmo tempo; quando um é pago, o outro deixa de valer.</p>
+  <figure class="narrow"><img src="../images/tela-pagamento-aprovado.png"><figcaption><b>Figura 18</b> Pagamento aprovado.</figcaption></figure>
+  <div class="note warn"><b class="t">Sandbox</b>Com <code>PAYMENTS_SANDBOX=true</code>, a aba do cartão lista os cartões de teste (clique para preencher) e Pix e boleto ganham o botão Simular pagamento, que faz o papel do banco.</div>
+
+  <h3 id="t-compras">Minhas compras</h3>
+  <figure><img src="../images/tela-compras.png"><figcaption><b>Figura 19</b> Minhas compras com filtros por status.</figcaption></figure>
+  <p>A página lista os pedidos do mais novo para o mais antigo, com as capas, o status, a forma de pagamento, a etapa do envio e a previsão de chegada. Os filtros separam o que está a pagar, em separação, a caminho, entregue ou cancelado. Atalho: <kbd>g</kbd> depois <kbd>c</kbd>.</p>
+
+  <h3 id="t-pedido">Detalhes do pedido e do envio</h3>
+  <figure><img src="../images/tela-envio.png"><figcaption><b>Figura 20</b> Pedido a caminho: progresso, rastreio, previsão e linha do tempo.</figcaption></figure>
+  <dl class="def">
+    <div class="item"><dt>Detalhes do envio</dt><dd>Barra com as quatro etapas (em separação, em trânsito, saiu para entrega, entregue), código de rastreio com botão de copiar, previsão de entrega e a linha do tempo com data, hora e local de cada evento.</dd></div>
+    <div class="item"><dt>Itens</dt><dd>Cada livro com a quantidade e o preço pagos. O preço fica guardado no pedido mesmo que mude depois.</dd></div>
+    <div class="item"><dt>Resumo, pagamento e entrega</dt><dd>Subtotal, desconto, frete e total; todas as tentativas de pagamento com o status de cada uma; o endereço copiado no momento da compra.</dd></div>
+    <div class="item"><dt>Comprar de novo</dt><dd>Em pedidos entregues ou cancelados, põe os mesmos livros e quantidades no carrinho. Os que não estiverem mais à venda ficam de fora, com aviso.</dd></div>
+    <div class="item"><dt>Imprimir comprovante</dt><dd>Abre a impressão do navegador com uma versão limpa do pedido, sem cabeçalho, rodapé nem botões. Dá para salvar em PDF.</dd></div>
+  </dl>
+  <div class="fig-pair">
+    <figure><img src="../images/tela-pedido-pago.png"><figcaption><b>Figura 21</b> Pedido entregue, com Comprar de novo e Imprimir comprovante.</figcaption></figure>
+    <figure><img src="../images/tela-pedido-pendente.png"><figcaption><b>Figura 22</b> Pedido aguardando pagamento, com o tempo restante e o botão de cancelar.</figcaption></figure>
+  </div>
+  <p>Enquanto o pedido não foi enviado, Cancelar pedido devolve os livros ao estoque e estorna o que já foi pago. Pedidos sem pagamento até o fim do prazo são cancelados automaticamente.</p>
+
+  <h3 id="t-conta">Minha conta</h3>
+  <figure><img src="../images/tela-conta.png"><figcaption><b>Figura 23</b> Dados, endereços e troca de senha.</figcaption></figure>
+  <p>Edite nome e telefone, gerencie até 10 endereços (um deles é o principal, usado primeiro no checkout) e troque a senha informando a atual. O e-mail identifica a conta e não muda por aqui.</p>
+
+  <h3 id="t-escuro">Tema escuro, celular e atalhos</h3>
+  <figure><img src="../images/tela-escuro.png"><figcaption><b>Figura 24</b> Vitrine no tema escuro.</figcaption></figure>
+  <p>O tema segue o sistema e pode ser trocado pelo ícone da lua ou do sol no topo (com a conta aberta, fica no menu da conta); a escolha fica salva no navegador. No celular, a busca desce para uma linha própria, os filtros viram um botão, a estante e os trilhos deslizam com o dedo e os botões das capas ficam sempre visíveis.</p>
+  <figure><img src="../images/tela-escuro-livro.png"><figcaption><b>Figura 25</b> Página do livro no tema escuro.</figcaption></figure>
+  <figure><img src="../images/tela-celular.png"><figcaption><b>Figura 26</b> Vitrine, livro e catálogo no celular.</figcaption></figure>
+  <table>
+    <thead><tr><th>Tecla</th><th>O que faz</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>/</kbd></td><td>Vai para a busca</td></tr>
+      <tr><td><kbd>g</kbd> depois <kbd>i</kbd></td><td>Vitrine</td></tr>
+      <tr><td><kbd>g</kbd> depois <kbd>l</kbd></td><td>Quero ler</td></tr>
+      <tr><td><kbd>g</kbd> depois <kbd>c</kbd></td><td>Minhas compras</td></tr>
+      <tr><td><kbd>c</kbd></td><td>Abre o carrinho</td></tr>
+      <tr><td><kbd>?</kbd></td><td>Mostra a lista de atalhos</td></tr>
+    </tbody>
+  </table>
+  <p>Os atalhos não disparam enquanto você digita num campo. Um link Pular para o conteúdo aparece ao apertar Tab no início da página.</p>
+</section>
+
+<!-- ===================== 4. ADMIN ===================== -->
+<section class="chapter" id="ch-admin">
+  <div class="chapter-head"><div class="num">Capítulo 4</div><h2>Administração</h2>
+    <p class="lede">A área da livraria aparece no menu da conta para quem tem o papel de administração. Dentro dela, a barra lateral leva ao painel, aos pedidos e envios, aos livros e ao estoque e às categorias e catálogos.</p></div>
+  <figure class="narrow"><img src="../images/tela-menu.png"><figcaption><b>Figura 27</b> Menu da conta, aberto pelo nome no topo da página.</figcaption></figure>
+
+  <h3 id="a-painel">Painel</h3>
+  <figure><img src="../images/tela-admin-painel.png"><figcaption><b>Figura 28</b> Painel com receita, pedidos por status, estoque baixo e mais vendidos.</figcaption></figure>
+  <ul>
+    <li>Receita e ticket médio dos pedidos pagos nos últimos 30 dias (cancelados ficam de fora).</li>
+    <li>Pedidos nos últimos 30 dias e hoje; para enviar (em separação) e a caminho; aguardando pagamento.</li>
+    <li>Pedidos por status: barras que levam à lista filtrada.</li>
+    <li>Estoque baixo: livros com 5 unidades ou menos, com atalho para repor. Embaixo, os mais vendidos com as capas.</li>
+  </ul>
+
+  <h3 id="a-pedidos">Pedidos e envios</h3>
+  <figure><img src="../images/tela-admin-pedidos.png"><figcaption><b>Figura 29</b> Pedidos com filtros, busca e exportação em CSV.</figcaption></figure>
+  <p>A lista mostra todos os pedidos com cliente, data, status, etapa do envio, forma de pagamento e total. Busque pelo código, pelo nome de quem recebe ou pelo e-mail exato da conta.</p>
+  <p><b>Exportar CSV</b> baixa todos os pedidos do filtro e da busca atuais (não só a página aberta) num arquivo separado por ponto e vírgula, que o Excel em português abre direto: pedido, cliente, data, status, envio, pagamento, itens e total.</p>
+  <figure><img src="../images/tela-admin-pedido.png"><figcaption><b>Figura 30</b> Pedido a caminho com o painel de ações.</figcaption></figure>
+  <p>Abra um pedido pago. O painel Ações mostra a próxima etapa do envio.</p>
+  <ol class="steps">
+    <li>Em Marcar como Em trânsito, informe o código de rastreio da transportadora ou deixe vazio para gerar um. O pedido passa para A caminho.</li>
+    <li>Depois, Saiu para entrega e Entregue. Cada clique cria um evento na linha do tempo do cliente; a observação opcional aparece para ele.</li>
+    <li>Cancelar e estornar fica disponível enquanto o pedido não foi postado.</li>
+  </ol>
+
+  <h3 id="a-livros">Livros e estoque</h3>
+  <figure><img src="../images/tela-admin-livros.png"><figcaption><b>Figura 31</b> Livros com estoque editável, filtros e exportação.</figcaption></figure>
+  <p>A lista mostra preço, vendidos e estoque. Mude o número do estoque e confirme com Enter ou com o botão que aparece. Os filtros da página separam estoque baixo (até 5), esgotados e livros fora da loja; a borda do campo de estoque fica mostarda ou vermelha nesses casos. Exportar CSV baixa o acervo inteiro (ou o resultado da busca) com ISBN, título, autoria, categoria, formato, preços, estoque, vendidos e se está à venda.</p>
+  <figure><img src="../images/tela-admin-livro.png"><figcaption><b>Figura 32</b> Edição de livro com a prévia da capa.</figcaption></figure>
+  <p>Novo livro e Editar abrem o formulário completo: título, subtítulo, autores (separados por ponto e vírgula; autores e editoras novos são criados na hora), editora, sinopse, ISBN, categoria, formato, preços, estoque, páginas, ano, peso e o estilo da capa (doze combinações), com prévia ao vivo. Retirar da loja esconde o livro sem apagar o histórico de pedidos.</p>
+
+  <h3 id="a-catalogo">Categorias e catálogos</h3>
+  <figure><img src="../images/tela-admin-catalogo.png"><figcaption><b>Figura 33</b> Categorias com cor e catálogos curados.</figcaption></figure>
+  <p>Renomeie categorias, troque a cor (uma das sete da paleta da marca) e ative ou desative cada uma. Crie catálogos novos e escolha quais aparecem na vitrine. A ordem dos livros de cada catálogo é definida pela API, com <code>PUT /api/admin/catalogs/{id}</code> e a lista de ids.</p>
+</section>
+
+<!-- ===================== 5. PAGAMENTOS ===================== -->
+<section class="chapter" id="ch-pag">
+  <div class="chapter-head"><div class="num">Capítulo 5</div><h2>Pagamentos e envio</h2>
+    <p class="lede">As regras de dinheiro e de entrega ficam na API. A interface só mostra o que a API decide.</p></div>
+
+  <h3 id="p-sandbox">Sandbox e cartões de teste</h3>
+  <p>O provedor que vem com o projeto é um sandbox: nada sai da aplicação e nenhum código gerado paga nada. O Pix usa um identificador de sandbox (não é um BR Code válido em bancos) e o boleto usa o banco fictício 000.</p>
+  <table>
+    <thead><tr><th>Cartão</th><th>Resultado</th></tr></thead>
+    <tbody>
+      <tr><td><code>4111 1111 1111 1111</code></td><td>Aprovado (Visa)</td></tr>
+      <tr><td><code>5555 5555 5555 4444</code></td><td>Aprovado (Mastercard)</td></tr>
+      <tr><td><code>4000 0000 0000 0002</code></td><td>Recusado pelo emissor</td></tr>
+      <tr><td><code>4000 0000 0000 9995</code></td><td>Limite insuficiente</td></tr>
+      <tr><td>Qualquer outro número válido</td><td>Aprovado</td></tr>
+    </tbody>
+  </table>
+  <p>Qualquer nome, validade futura e CVV de 3 dígitos (4 no Amex) funcionam.</p>
+
+  <h3 id="p-cartao">Como o cartão é protegido</h3>
+  <div class="flow">
+    <div><b>Janela</b>número, nome, validade e CVV</div>
+    <div><b>API</b>Luhn, validade e bandeira</div>
+    <div><b>Redis</b>token de 10 min, bandeira e 4 dígitos</div>
+    <div><b>Banco</b>bandeira, 4 dígitos e parcelas</div>
+  </div>
+  <ol class="steps">
+    <li>A janela envia número, nome, validade e CVV para <code>POST /api/payments/card-tokens</code>.</li>
+    <li>A API confere o dígito verificador (Luhn), a validade e a bandeira, e guarda no Redis só um token de 10 minutos com bandeira, 4 últimos dígitos e o resultado previsto. Número e CVV não são gravados em lugar nenhum nem aparecem nos logs.</li>
+    <li>O pagamento usa o token, que vale uma vez só. No banco ficam a bandeira, os 4 últimos dígitos e as parcelas.</li>
+  </ol>
+
+  <h3 id="p-idem">Idempotência</h3>
+  <p>A janela manda um cabeçalho <code>Idempotency-Key</code> a cada tentativa. Se a mesma chave chegar de novo (clique duplo, conexão que caiu), a API devolve o mesmo pagamento em vez de criar outro. Pix e boleto pendentes do mesmo pedido também são reaproveitados enquanto valerem. O pedido tem bloqueio otimista: dois pagamentos ao mesmo tempo nunca aprovam o pedido duas vezes.</p>
+
+  <h3 id="p-real">Plugar um provedor real</h3>
+  <ol class="steps">
+    <li>Implemente a interface <code>PaymentGateway</code> (<code>authorizeCard</code>, <code>pixPayload</code>, <code>boletoLine</code>, <code>newReference</code>) chamando o provedor escolhido.</li>
+    <li>Registre a implementação como bean no lugar do <code>SandboxGateway</code>.</li>
+    <li>Crie uma rota de webhook que chame a confirmação do pagamento.</li>
+    <li>Defina <code>PAYMENTS_SANDBOX=false</code>, que desliga os botões de simulação e a rota <code>/api/sandbox</code>.</li>
+  </ol>
+
+  <h3 id="p-frete">Frete</h3>
+  <p>As formas de envio ficam na tabela <code>shipping_method</code> (taxa base, valor por quilo, frete grátis a partir de, prazo mínimo e máximo). O peso é arredondado para cima em quilos e a região do CEP ajusta valor e prazo:</p>
+  <table>
+    <thead><tr><th>CEP começa com</th><th>Região</th><th>Fator no valor</th></tr></thead>
+    <tbody>
+      <tr><td>0 e 1</td><td>São Paulo</td><td>1,00</td></tr>
+      <tr><td>2</td><td>Rio de Janeiro e Espírito Santo</td><td>1,05</td></tr>
+      <tr><td>3</td><td>Minas Gerais</td><td>1,10</td></tr>
+      <tr><td>4</td><td>Bahia e Sergipe</td><td>1,30</td></tr>
+      <tr><td>5</td><td>PE, AL, PB e RN</td><td>1,40</td></tr>
+      <tr><td>6</td><td>Norte, CE, PI e MA</td><td>1,55</td></tr>
+      <tr><td>7</td><td>Centro-Oeste, TO, RO e AC</td><td>1,30</td></tr>
+      <tr><td>8</td><td>Paraná e Santa Catarina</td><td>1,15</td></tr>
+      <tr><td>9</td><td>Rio Grande do Sul</td><td>1,20</td></tr>
+    </tbody>
+  </table>
+  <p>Regiões mais distantes também somam dias ao prazo. A previsão de entrega conta dias úteis a partir do pagamento.</p>
+
+  <h3 id="p-prazos">Prazos e cancelamento automático</h3>
+  <ul>
+    <li>O estoque é reservado no checkout e o pedido tem 60 minutos para ser pago (cartão e Pix). Gerar um boleto estende o prazo até o vencimento.</li>
+    <li>A cada minuto, uma tarefa cancela os pedidos vencidos, marca os pagamentos pendentes como expirados e devolve o estoque. Uma trava no Redis garante que só uma instância da API faça isso por vez.</li>
+  </ul>
+
+  <h3 id="p-cupons">Cupons</h3>
+  <p>Ficam na tabela <code>coupon</code>: percentual ou valor fixo, subtotal mínimo e validade. O frete grátis considera o subtotal já com o desconto.</p>
+</section>
+
+<!-- ===================== 6. ARQUITETURA ===================== -->
+<section class="chapter" id="ch-arq">
+  <div class="chapter-head"><div class="num">Capítulo 6</div><h2>Arquitetura</h2>
+    <p class="lede">Uma API Spring Boot organizada por domínio, uma interface React e dois serviços de dados: o banco relacional (qualquer um dos quatro) e o Redis.</p></div>
+  <div class="flow">
+    <div><b>Navegador</b>React 19 e Vite</div>
+    <div><b>web</b>nginx, repassa /api</div>
+    <div><b>api</b>Spring Boot 4.1, Java 21</div>
+    <div><b>Banco</b>PostgreSQL, MySQL, SQL Server ou Oracle</div>
+    <div><b>Redis 7</b>cache, tokens e travas</div>
+    <div><b>Pagamentos</b>PaymentGateway, sandbox ou provedor real</div>
+  </div>
+  <p>O Flyway roda as migrações de <code>db/migration/{banco}</code> quando a API sobe. Os pagamentos passam pela interface <code>PaymentGateway</code>; o projeto vem com o sandbox, que pode ser trocado por um provedor real (capítulo 5).</p>
+
+  <h3 id="r-pacotes">Pacotes da API</h3>
+  <table>
+    <thead><tr><th>Pacote</th><th>Responsabilidade</th></tr></thead>
+    <tbody>
+      <tr><td><code>auth</code></td><td>Contas, login, cadastro, JWT, renovação de sessão no Redis, limite de tentativas</td></tr>
+      <tr><td><code>account</code></td><td>Perfil, senha e endereços</td></tr>
+      <tr><td><code>catalog</code></td><td>Livros, autores, editoras, categorias, catálogos curados, busca com Criteria e cache</td></tr>
+      <tr><td><code>cart</code></td><td>Carrinho da conta e junção com o carrinho do navegador</td></tr>
+      <tr><td><code>order</code></td><td>Checkout, cupons, pedidos, ciclo de vida (pago, enviado, entregue, cancelado) e expiração</td></tr>
+      <tr><td><code>payment</code></td><td>Tokens de cartão, gateway, cartão, Pix, boleto, idempotência e sandbox</td></tr>
+      <tr><td><code>shipping</code></td><td>Formas de envio, cotação por região e peso, envios e eventos de rastreio</td></tr>
+      <tr><td><code>admin</code></td><td>Painel e rotas de administração (pedidos, livros, estoque, categorias, catálogos)</td></tr>
+      <tr><td><code>common</code> e <code>config</code></td><td>Erros no formato Problem Details, normalização de texto, travas, segurança, cache, OpenAPI</td></tr>
+      <tr><td><code>seed</code></td><td>Formas de envio sempre; acervo, contas e pedidos de demonstração quando ligado</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="r-interface">Interface</h3>
+  <table>
+    <thead><tr><th>Parte</th><th>O que faz</th></tr></thead>
+    <tbody>
+      <tr><td><code>lib/api.js</code></td><td>Cliente da API: token só na memória, renovação automática pelo cookie e erros no formato da API</td></tr>
+      <tr><td><code>lib/auth.jsx</code>, <code>lib/cart.jsx</code></td><td>Sessão e carrinho (no navegador sem login, na conta depois de entrar)</td></tr>
+      <tr><td><code>lib/library.jsx</code></td><td>Quero ler e vistos por último, guardados no navegador, com o preço e o estoque do dia em que o livro foi guardado</td></tr>
+      <tr><td><code>lib/csv.js</code></td><td>Exportação em CSV da administração: busca todas as páginas da API e gera o arquivo no navegador</td></tr>
+      <tr><td><code>components/Shelf.jsx</code>, <code>BookCover.jsx</code></td><td>Estante de lombadas e capas geradas, a partir do estilo de capa de cada livro</td></tr>
+      <tr><td><code>components/SearchBox.jsx</code>, <code>Shortcuts.jsx</code></td><td>Busca com sugestões e atalhos de teclado</td></tr>
+      <tr><td><code>styles/tokens.css</code></td><td>Cores dos dois temas, fontes, raios e sombras</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="r-seg">Segurança</h3>
+  <dl class="def">
+    <div class="item"><dt>Senhas</dt><dd>BCrypt com custo 11. Login com e-mail inexistente leva o mesmo tempo que um login com senha errada.</dd></div>
+    <div class="item"><dt>Token de acesso</dt><dd>JWT HS256 de 15 minutos, guardado só na memória do navegador (nunca no <code>localStorage</code>).</dd></div>
+    <div class="item"><dt>Renovação</dt><dd>Cookie HttpOnly, SameSite Strict, restrito a <code>/api/auth</code>. O Redis guarda só o hash SHA-256 do token; cada uso gira o token e sair apaga a chave na hora.</dd></div>
+    <div class="item"><dt>Limite de tentativas</dt><dd>5 senhas erradas por e-mail em 15 minutos.</dd></div>
+    <div class="item"><dt>Autorização</dt><dd><code>/api/admin/**</code> só para <code>ADMIN</code>. Pedidos e pagamentos só aparecem para o dono; outra conta recebe 404.</dd></div>
+    <div class="item"><dt>Validação</dt><dd>Todas as entradas passam por Bean Validation, e as respostas de erro não mostram detalhes internos.</dd></div>
+    <div class="item"><dt>Cabeçalhos</dt><dd>CSP, X-Frame-Options, nosniff e Referrer-Policy na API e no nginx.</dd></div>
+  </dl>
+
+  <h3 id="r-redis">Redis</h3>
+  <table>
+    <thead><tr><th>Chave</th><th>Para quê</th><th>Vida</th></tr></thead>
+    <tbody>
+      <tr><td><code>livraria:cache:*</code></td><td>Vitrine, categorias, catálogos e detalhe dos livros</td><td>5 a 30 min; limpo ao mudar estoque, preço ou vitrine</td></tr>
+      <tr><td><code>livraria:auth:refresh:&lt;hash&gt;</code></td><td>Token de renovação de sessão</td><td>7 dias</td></tr>
+      <tr><td><code>livraria:auth:fail:&lt;email&gt;</code></td><td>Contador de senhas erradas</td><td>15 min</td></tr>
+      <tr><td><code>livraria:pay:card:tok_*</code></td><td>Token do cartão (bandeira e 4 últimos dígitos)</td><td>10 min, uso único</td></tr>
+      <tr><td><code>livraria:lock:*</code></td><td>Travas da expiração de pedidos e da carga inicial</td><td>até 5 min</td></tr>
+    </tbody>
+  </table>
+  <p>Se o Redis for apagado, nada se perde: o cache se refaz, as pessoas entram de novo e os pedidos continuam no banco.</p>
+
+  <h3 id="r-pastas">Estrutura de pastas</h3>
+  <pre>backend/
+  src/main/java/io/github/violetpixel/bookstore/
+    auth/ account/ catalog/ cart/ order/ payment/ shipping/ admin/ common/ config/ seed/
+  src/main/resources/
+    application.yml                 configuração geral
+    application-&lt;banco&gt;.yml         URL JDBC de cada banco
+    db/migration/&lt;banco&gt;/V1__estrutura_inicial.sql
+  src/test/java/...                 testes de integração
+frontend/
+  public/fonts/       Literata, Public Sans e IBM Plex Mono (com as licenças)
+  src/pages/          vitrine, catálogo, livro, autoria, quero ler, carrinho, checkout,
+                      compras, pedido, conta, entrada, admin
+  src/components/     estante, capas, cartão de livro, busca, gaveta, janela de
+                      pagamento, linha do tempo, atalhos, formulários
+  src/lib/            cliente da API, sessão, carrinho, quero ler, CSV, formatação
+  nginx.conf          entrega da interface e repasse de /api
+docs/
+  fonte/              HTML e CSS destes manuais e o script que gera os PDFs
+  images/             capturas de tela do README e dos manuais
+docker-compose.yml    bancos por perfil, Redis, API e interface
+iniciar.cmd / iniciar.sh / scripts/criar-env.ps1</pre>
+</section>
+
+<!-- ===================== 7. API ===================== -->
+<section class="chapter" id="ch-api">
+  <div class="chapter-head"><div class="num">Capítulo 7</div><h2>API REST</h2>
+    <p class="lede">A documentação interativa fica em <code>/api/docs</code>. Este capítulo lista as rotas que a interface usa.</p></div>
+  <figure><img src="../images/tela-docs.png"><figcaption><b>Figura 34</b> Swagger com todas as rotas agrupadas.</figcaption></figure>
+
+  <h3 id="i-auth">Autenticação</h3>
+  <p><code>POST /api/auth/login</code> devolve <code>accessToken</code>, <code>expiresIn</code> e os dados da conta, e grava o cookie de renovação. Envie o token em <code>Authorization: Bearer &lt;token&gt;</code>. Quando ele expirar (401), chame <code>POST /api/auth/refresh</code> com o cookie. O cliente da interface (<code>frontend/src/lib/api.js</code>) faz isso sozinho e repete a chamada uma vez.</p>
+
+  <h3 id="i-rotas">Rotas principais</h3>
+  <table class="routes">
+    <thead><tr><th>Rota</th><th>O que faz</th></tr></thead>
+    <tbody>
+      <tr><td>GET /api/home</td><td>Catálogos, categorias e destaques da vitrine</td></tr>
+      <tr><td>GET /api/books</td><td>Busca: <code>q</code>, <code>category</code>, <code>catalog</code>, <code>format</code>, <code>minPrice</code>, <code>maxPrice</code>, <code>inStock</code>, <code>sort</code>, <code>page</code>, <code>size</code>. A interface usa a mesma rota para as sugestões, a estante e a página da autoria</td></tr>
+      <tr><td>GET /api/books/{slug}</td><td>Detalhe com autores, ficha técnica e relacionados. Quero ler usa esta rota para conferir preço e estoque de hoje</td></tr>
+      <tr><td>GET /api/categories, /api/catalogs/{slug}</td><td>Categorias com contagem e catálogos curados</td></tr>
+      <tr><td>POST /api/shipping/quote</td><td>Frete por CEP, peso e subtotal (pública)</td></tr>
+      <tr><td>POST /api/auth/register, login, refresh, logout; GET me</td><td>Conta e sessão</td></tr>
+      <tr><td>GET/POST /api/cart, /items, /merge</td><td>Carrinho: ver, adicionar, mudar quantidade, remover, juntar</td></tr>
+      <tr><td>POST /api/checkout/quote</td><td>Simula subtotal, cupom e opções de frete para um endereço</td></tr>
+      <tr><td>POST /api/orders</td><td>Fecha o pedido e reserva o estoque</td></tr>
+      <tr><td>GET /api/orders, /api/orders/{codigo}</td><td>Minhas compras e detalhe com pagamentos e envio</td></tr>
+      <tr><td>POST /api/orders/{codigo}/cancel</td><td>Cancela e estorna (antes do envio)</td></tr>
+      <tr><td>GET /api/payments/methods, /api/orders/{codigo}/installments</td><td>Formas de pagamento e parcelas</td></tr>
+      <tr><td>POST /api/payments/card-tokens</td><td>Troca os dados do cartão por um token de uso único</td></tr>
+      <tr><td>POST /api/orders/{codigo}/payments</td><td>Paga com <code>CREDIT_CARD</code>, <code>PIX</code> ou <code>BOLETO</code> (aceita <code>Idempotency-Key</code>)</td></tr>
+      <tr><td>GET /api/payments/{referencia}</td><td>Status de um pagamento (consultado pela janela do Pix)</td></tr>
+      <tr><td>/api/account/profile, /password, /addresses</td><td>Dados, senha e endereços</td></tr>
+      <tr><td>/api/admin/dashboard, /orders, /books, /categories, /catalogs</td><td>Administração. A exportação em CSV percorre <code>/orders</code> e <code>/books</code> de 100 em 100</td></tr>
+      <tr><td>POST /api/admin/orders/{codigo}/shipment/advance</td><td>Avança o envio (com rastreio e observação opcionais)</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="i-ex">Exemplos</h3>
+  <pre># entrar e guardar o token
+TOKEN=$(curl -s -H "Content-Type: application/json" \
+  -d '{"email":"leitora@prelo.dev","password":"Prelo@2026"}' \
+  http://localhost:8080/api/auth/login | jq -r .accessToken)
+
+# livros de tecnologia, do mais barato ao mais caro
+curl "http://localhost:8080/api/books?category=tecnologia&amp;sort=price_asc&amp;size=6"
+
+# fechar um pedido e pagar com cartão de teste
+curl -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"addressId":1,"shippingMethod":"ECONOMICA"}' http://localhost:8080/api/orders
+CARD=$(curl -s -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"number":"4111111111111111","holderName":"TESTE","expMonth":12,"expYear":2031,"cvv":"123"}' \
+  http://localhost:8080/api/payments/card-tokens | jq -r .token)
+curl -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -H "Idempotency-Key: $(uuidgen)" \
+  -d "{\"method\":\"CREDIT_CARD\",\"cardToken\":\"$CARD\",\"installments\":2}" \
+  http://localhost:8080/api/orders/PED-261021-ABCDE/payments</pre>
+
+  <h3 id="i-erros">Erros</h3>
+  <p>Todo erro segue o formato Problem Details (RFC 9457) com um campo <code>code</code> estável. Em erros de validação, o campo <code>fields</code> traz a mensagem de cada campo:</p>
+  <pre>{"status":409,"title":"Conflict","code":"estoque_insuficiente",
+ "detail":"Não há estoque suficiente de “Redis em Produção”. Ajuste a quantidade no carrinho."}</pre>
+  <table>
+    <thead><tr><th>Status</th><th>Códigos mais comuns</th></tr></thead>
+    <tbody>
+      <tr><td>400</td><td><code>dados_invalidos</code>, <code>cep_invalido</code>, <code>cartao_invalido</code>, <code>parcelas_invalidas</code></td></tr>
+      <tr><td>401</td><td><code>nao_autenticado</code>, <code>credenciais_invalidas</code>, <code>sessao_expirada</code></td></tr>
+      <tr><td>403</td><td><code>sem_permissao</code></td></tr>
+      <tr><td>404</td><td><code>nao_encontrado</code></td></tr>
+      <tr><td>409</td><td><code>estoque_insuficiente</code>, <code>email_em_uso</code>, <code>pedido_nao_pendente</code>, <code>registro_alterado</code></td></tr>
+      <tr><td>422</td><td><code>carrinho_vazio</code>, <code>cupom_invalido</code>, <code>esgotado</code>, <code>prazo_expirado</code>, <code>nao_cancelavel</code></td></tr>
+      <tr><td>429</td><td><code>muitas_tentativas</code></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===================== 8. CONFIG ===================== -->
+<section class="chapter" id="ch-cfg">
+  <div class="chapter-head"><div class="num">Capítulo 8</div><h2>Configuração</h2>
+    <p class="lede">Tudo é configurado por variáveis de ambiente, que o Docker Compose lê do <code>.env</code>.</p></div>
+  <h3 id="c-app">Aplicação</h3>
+  <table class="cfg">
+    <thead><tr><th>Variável</th><th>Padrão</th><th>O que faz</th></tr></thead>
+    <tbody>
+      <tr><td>APP_PORT</td><td>8080</td><td>Porta da loja no navegador</td></tr>
+      <tr><td>APP_SEED_DEMO</td><td>true</td><td>Dados de demonstração num banco vazio</td></tr>
+      <tr><td>APP_HTTPS</td><td>false</td><td>Cookie de sessão só por HTTPS</td></tr>
+      <tr><td>APP_CORS_ORIGINS</td><td>http://localhost:8080</td><td>Origens liberadas para chamar a API</td></tr>
+      <tr><td>API_DOCS_ENABLED</td><td>true</td><td>Swagger em <code>/api/docs</code></td></tr>
+      <tr><td>APP_JOBS_ENABLED</td><td>true</td><td>Tarefa de expiração de pedidos</td></tr>
+      <tr><td>JWT_SECRET</td><td>sem padrão</td><td>Chave do JWT, com 32 caracteres ou mais (ou Base64 de 32 bytes)</td></tr>
+      <tr><td>JWT_ACCESS_TTL, JWT_REFRESH_TTL</td><td>15m, 7d</td><td>Vida do token de acesso e da sessão</td></tr>
+    </tbody>
+  </table>
+  <h3 id="c-banco">Banco e Redis</h3>
+  <table class="cfg">
+    <thead><tr><th>Variável</th><th>Padrão</th><th>O que faz</th></tr></thead>
+    <tbody>
+      <tr><td>DB_VENDOR</td><td>postgresql</td><td><code>postgresql</code>, <code>mysql</code>, <code>sqlserver</code> ou <code>oracle</code></td></tr>
+      <tr><td>COMPOSE_PROFILES</td><td>postgresql</td><td>Igual a <code>DB_VENDOR</code>: qual contêiner de banco sobe</td></tr>
+      <tr><td>DB_HOST, DB_PORT</td><td>db, porta do banco</td><td>Endereço do banco (no Docker, sempre <code>db</code>)</td></tr>
+      <tr><td>DB_NAME, DB_USER, DB_PASSWORD</td><td>prelo, prelo, sem padrão</td><td>Banco, usuário e senha. No Oracle o serviço é <code>ORACLE_SERVICE</code> (padrão <code>FREEPDB1</code>)</td></tr>
+      <tr><td>DB_URL</td><td>sem padrão</td><td>URL JDBC completa, se preferir informar direto</td></tr>
+      <tr><td>DB_POOL_SIZE</td><td>10</td><td>Conexões no pool (HikariCP)</td></tr>
+      <tr><td>REDIS_HOST, REDIS_PORT, REDIS_PASSWORD</td><td>redis, 6379, sem padrão</td><td>Redis</td></tr>
+    </tbody>
+  </table>
+  <h3 id="c-pag">Pagamentos</h3>
+  <table class="cfg">
+    <thead><tr><th>Variável</th><th>Padrão</th><th>O que faz</th></tr></thead>
+    <tbody>
+      <tr><td>PAYMENTS_SANDBOX</td><td>true</td><td>Cartões de teste e simulação de Pix e boleto</td></tr>
+      <tr><td>PAYMENTS_ORDER_HOLD</td><td>60m</td><td>Prazo para pagar um pedido (estoque reservado)</td></tr>
+      <tr><td>PAYMENTS_PIX_TTL</td><td>30m</td><td>Validade do QR Code Pix</td></tr>
+    </tbody>
+  </table>
+  <h3 id="c-prod">Checklist para produção</h3>
+  <ul>
+    <li><code>APP_SEED_DEMO=false</code> num banco vazio e a sua conta promovida a administração.</li>
+    <li><code>JWT_SECRET</code> e <code>DB_PASSWORD</code> fortes e só no servidor (o <code>.env</code> nunca vai para o Git).</li>
+    <li>Proxy com HTTPS na frente da porta 8080 e <code>APP_HTTPS=true</code>.</li>
+    <li><code>PAYMENTS_SANDBOX=false</code> com um <code>PaymentGateway</code> real.</li>
+    <li><code>API_DOCS_ENABLED=false</code>, se a documentação não for pública.</li>
+    <li>Backup do banco (o PDF de banco de dados traz o comando de cada um) e do volume do Redis, se quiser manter as sessões.</li>
+  </ul>
+</section>
+
+<!-- ===================== 9. TESTES ===================== -->
+<section class="chapter" id="ch-testes">
+  <div class="chapter-head"><div class="num">Capítulo 9</div><h2>Testes e integração contínua</h2>
+    <p class="lede">Os testes da API sobem a aplicação inteira contra um banco e um Redis reais, nos quatro bancos.</p></div>
+  <h3 id="x-api">Testes da API</h3>
+  <table>
+    <thead><tr><th>Classe</th><th>O que cobre</th></tr></thead>
+    <tbody>
+      <tr><td><code>AuthTest</code></td><td>Cadastro, e-mail repetido, login, renovação com rotação do token, saída, bloqueio após 5 senhas erradas, validação de campos, acesso negado à administração</td></tr>
+      <tr><td><code>CatalogTest</code></td><td>Vitrine (e cache), busca sem acentos, por autor e por ISBN, filtros, ordenação, paginação, detalhe, catálogo, categoria, frete por região e frete grátis</td></tr>
+      <tr><td><code>CheckoutFlowTest</code></td><td>Carrinho, cupom, checkout, baixa de estoque, cartão aprovado e recusado, token de uso único, Pix com idempotência, sandbox, Pix e boleto juntos, boleto estendendo o prazo, cancelamento com devolução do estoque, expiração, venda acima do estoque, envio até a entrega e pedidos de outra conta</td></tr>
+      <tr><td><code>SchemaValidationTest</code></td><td>O Hibernate confere cada entidade contra as tabelas criadas pelo Flyway (PostgreSQL e MySQL)</td></tr>
+    </tbody>
+  </table>
+  <pre>cd backend
+DB_PASSWORD=prelo mvn verify                                     # PostgreSQL local
+DB_VENDOR=mysql DB_HOST=127.0.0.1 DB_PASSWORD=prelo mvn verify   # MySQL
+DB_VENDOR=sqlserver DB_PASSWORD=... mvn verify                   # SQL Server
+DB_VENDOR=oracle DB_PASSWORD=... mvn verify                      # Oracle (FREEPDB1)</pre>
+  <p>Os testes usam o banco 15 do Redis, separado do da aplicação, criam contas novas a cada execução e ajustam o estoque antes de comprar. Por isso podem rodar várias vezes no mesmo banco.</p>
+  <h3 id="x-ui">Testes da interface</h3>
+  <pre>cd frontend
+npm test          # Vitest: formatação, capas geradas, slug da autoria e Quero ler
+npm run build     # build de produção</pre>
+  <h3 id="x-ci">Integração contínua</h3>
+  <p>O GitHub Actions roda a cada push e pull request:</p>
+  <table>
+    <thead><tr><th>Job</th><th>O que faz</th></tr></thead>
+    <tbody>
+      <tr><td>API nos 4 bancos</td><td>Matriz com PostgreSQL 16, MySQL 8.4, SQL Server 2022 e Oracle 23ai Free: sobe o banco, cria o usuário e roda <code>mvn verify</code></td></tr>
+      <tr><td>Interface</td><td><code>npm ci</code>, testes e build com Node 22</td></tr>
+      <tr><td>Docker</td><td>Valida o Compose nos quatro perfis e constrói as imagens da API e da interface</td></tr>
+    </tbody>
+  </table>
+  <h3 id="x-pdf">Gerar estes manuais</h3>
+  <p>Os dois PDFs saem do HTML e do CSS de <code>docs/fonte/</code>, com as fontes da interface e as capturas de <code>docs/images/</code>. O script grava o PDF na raiz e uma cópia idêntica em <code>docs/</code>.</p>
+  <pre>pip install weasyprint==70.0
+python docs/fonte/gerar_pdfs.py            # os dois
+python docs/fonte/gerar_pdfs.py manual     # só o manual
+python docs/fonte/gerar_pdfs.py banco      # só o banco de dados</pre>
+</section>
+
+<!-- ===================== 10. PROBLEMAS ===================== -->
+<section class="chapter" id="ch-prob">
+  <div class="chapter-head"><div class="num">Capítulo 10</div><h2>Solução de problemas</h2>
+    <p class="lede">Os sintomas mais comuns, a causa provável e o que fazer.</p></div>
+  <table>
+    <thead><tr><th>O que acontece</th><th>Causa provável</th><th>O que fazer</th></tr></thead>
+    <tbody>
+      <tr><td>O script diz que o Prelo ainda está subindo</td><td>Oracle e SQL Server demoram na primeira vez</td><td>Acompanhe com <code>docker compose logs -f api</code> e espere; rode o script de novo depois</td></tr>
+      <tr><td>Defina DB_PASSWORD no .env</td><td>O <code>.env</code> não tem senha</td><td>Apague o <code>.env</code> e rode o script de novo, ou preencha à mão</td></tr>
+      <tr><td>SQL Server não sobe</td><td>Senha fraca para o usuário <code>sa</code></td><td>Use letras maiúsculas, minúsculas e números (os scripts já geram assim)</td></tr>
+      <tr><td>Mudei DB_VENDOR e subiu o banco antigo</td><td><code>COMPOSE_PROFILES</code> diferente</td><td>Deixe os dois iguais ou rode o script, que corrige</td></tr>
+      <tr><td>Porta 8080 ocupada</td><td>Outro programa usa a porta</td><td>Mude <code>APP_PORT</code> no <code>.env</code></td></tr>
+      <tr><td>Todo mundo cai da sessão depois de reiniciar</td><td><code>JWT_SECRET</code> vazio fora do Docker</td><td>Defina uma chave fixa; sem ela a API usa uma temporária</td></tr>
+      <tr><td>CEP não preenche sozinho</td><td>Sem acesso ao serviço de CEP</td><td>Preencha à mão; o resto funciona normalmente</td></tr>
+      <tr><td>Pagamento com cartão diz que os dados expiraram</td><td>Token do cartão já usado ou com mais de 10 min</td><td>Digite o cartão de novo</td></tr>
+      <tr><td><code>estoque_insuficiente</code> no checkout</td><td>Alguém comprou o último exemplar antes</td><td>Ajuste a quantidade no carrinho</td></tr>
+      <tr><td>Pedido cancelado sozinho</td><td>Passou o prazo de pagamento</td><td>Faça o pedido de novo; o estoque já voltou</td></tr>
+      <tr><td>Quero ler sumiu</td><td>A lista fica no navegador; outro navegador, aba anônima ou dados do site apagados</td><td>Guarde os livros de novo no navegador que você usa</td></tr>
+      <tr><td>Fontes antigas ainda aparecem</td><td>Cache do navegador depois de atualizar</td><td>Recarregue sem cache (Ctrl+Shift+R) ou rode <code>docker compose up -d --build</code></td></tr>
+      <tr><td>Não vejo o menu Administração</td><td>A conta é de cliente</td><td>Promova a conta no banco e entre de novo</td></tr>
+      <tr><td>Quero começar do zero</td><td></td><td><code>docker compose down -v</code> apaga banco e Redis</td></tr>
+    </tbody>
+  </table>
+</section>
+</body>
+</html>

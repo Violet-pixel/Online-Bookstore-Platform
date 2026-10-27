@@ -1,6 +1,7 @@
-import { ArrowLeft, Clock, Copy, CreditCard, MapPin, Truck, XCircle } from 'lucide-react';
+import { ArrowLeft, Clock, Copy, CreditCard, MapPin, Printer, RotateCcw, Truck, XCircle } from 'lucide-react';
 import { useCallback, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
+import { useCart } from '../lib/cart.jsx';
 import BookCover from '../components/BookCover.jsx';
 import { Empty, OrderBadge, PaymentBadge, Spinner } from '../components/Bits.jsx';
 import { Modal } from '../components/Overlay.jsx';
@@ -118,6 +119,23 @@ export default function Order() {
   const [busy, setBusy] = useState(false);
   useTitle(order ? `Pedido ${order.code}` : 'Pedido');
   const refresh = useCallback(() => reload(), [reload]);
+  const { add } = useCart();
+  const navigate = useNavigate();
+
+  async function buyAgain() {
+    setBusy(true);
+    let skipped = 0;
+    for (const it of order.items) {
+      try {
+        await add({ id: it.bookId, slug: it.slug, title: it.title, authors: [it.authors], price: it.unitPrice, listPrice: it.unitPrice, coverStyle: it.coverStyle }, it.quantity);
+      } catch {
+        skipped += 1;
+      }
+    }
+    setBusy(false);
+    toast(skipped ? `${skipped} livro(s) não estão mais disponíveis; o resto foi para o carrinho.` : 'Os livros deste pedido foram para o carrinho.');
+    navigate('/carrinho');
+  }
 
   if (error) return <div className="container page"><Empty title="Pedido não encontrado" action={<Link to="/compras" className="btn btn-dark">Minhas compras</Link>} /></div>;
   if (loading && !order) return <div className="container page"><div className="skeleton" style={{ height: 80, margin: '26px 0' }} /><div className="skeleton" style={{ height: 380 }} /></div>;
@@ -160,7 +178,13 @@ export default function Order() {
           <h1 className="num" style={{ fontSize: 'clamp(30px, 3.8vw, 44px)' }}>Pedido {order.code}</h1>
           <span className="muted">Feito em {dateTime(order.placedAt)}{order.paidAt ? `, pago em ${dateTime(order.paidAt)}` : ''}</span>
         </div>
-        <OrderBadge status={order.status} />
+        <div className="row wrap no-print" style={{ gap: 8 }}>
+          <OrderBadge status={order.status} />
+          {(order.status === 'DELIVERED' || order.status === 'CANCELED') && (
+            <button type="button" className="btn btn-sm" disabled={busy} onClick={buyAgain}><RotateCcw size={14} /> Comprar de novo</button>
+          )}
+          <button type="button" className="btn btn-sm btn-ghost" onClick={() => window.print()}><Printer size={14} /> Imprimir comprovante</button>
+        </div>
       </div>
       {order.status === 'CANCELED' && <div className="alert red" style={{ marginBottom: 18 }}><XCircle size={18} /> Pedido cancelado em {dateTime(order.canceledAt)}. {order.cancelReason}</div>}
       <OrderView order={order} actions={actions} />

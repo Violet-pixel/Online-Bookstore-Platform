@@ -8,6 +8,7 @@ import './styles/pages.css';
 import App from './App.jsx';
 import { AuthProvider } from './lib/auth.jsx';
 import { CartProvider } from './lib/cart.jsx';
+import { LibraryProvider } from './lib/library.jsx';
 import { ToastProvider } from './lib/toast.jsx';
 
 createRoot(document.getElementById('root')).render(
@@ -16,7 +17,9 @@ createRoot(document.getElementById('root')).render(
       <ToastProvider>
         <AuthProvider>
           <CartProvider>
-            <App />
+            <LibraryProvider>
+              <App />
+            </LibraryProvider>
           </CartProvider>
         </AuthProvider>
       </ToastProvider>

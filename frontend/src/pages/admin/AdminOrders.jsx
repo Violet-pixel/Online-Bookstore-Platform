@@ -1,7 +1,10 @@
-import { Search } from 'lucide-react';
+import { Download, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
-import { OrderBadge, Pager } from '../../components/Bits.jsx';
+import { OrderBadge, Pager, Spinner } from '../../components/Bits.jsx';
+import { decimal, downloadCsv, fetchAll, today } from '../../lib/csv.js';
+import { useToast } from '../../lib/toast.jsx';
+import { ORDER_STATUS } from '../../lib/format.js';
 import { qs } from '../../lib/api.js';
 import { dateTime, money, PAYMENT_METHOD, SHIPMENT_STATUS } from '../../lib/format.js';
 import { useFetch } from '../../lib/hooks.js';
@@ -15,13 +18,30 @@ export default function AdminOrders() {
   const page = Number(params.get('pagina') || 0);
   const [term, setTerm] = useState(q);
   const { data } = useFetch(`/api/admin/orders${qs({ status, q, page, size: 15 })}`);
+  const toast = useToast();
+  const [exporting, setExporting] = useState(false);
+  async function exportCsv() {
+    setExporting(true);
+    try {
+      const rows = await fetchAll('/api/admin/orders', { status, q });
+      downloadCsv(`prelo-pedidos-${today()}.csv`, [
+        ['Pedido', (o) => o.code], ['Cliente', (o) => o.customerName], ['Feito em', (o) => dateTime(o.placedAt)],
+        ['Status', (o) => ORDER_STATUS[o.status]?.label || o.status], ['Envio', (o) => (o.shipmentStatus ? SHIPMENT_STATUS[o.shipmentStatus] : '')],
+        ['Pagamento', (o) => (o.paymentMethod ? PAYMENT_METHOD[o.paymentMethod] : '')], ['Itens', (o) => o.itemCount], ['Total (R$)', (o) => decimal(o.total)],
+      ], rows);
+      toast(`${rows.length} pedidos exportados`);
+    } catch (e) { toast(e.message, { error: true }); } finally { setExporting(false); }
+  }
   const set = (next) => setParams(Object.fromEntries(Object.entries({ status, q, ...next }).filter(([, v]) => v !== '' && v !== undefined)));
   return (
     <div className="stack fade" style={{ gap: 18 }}>
       <div className="row between wrap"><h1>Pedidos e envios</h1>
+        <div className="row wrap">
+        <button type="button" className="btn" onClick={exportCsv} disabled={exporting}>{exporting ? <Spinner /> : <Download size={15} />} Exportar CSV</button>
         <form className="search" style={{ maxWidth: 320 }} onSubmit={(e) => { e.preventDefault(); set({ q: term, pagina: '' }); }}>
-          <Search className="icon" /><input value={term} onChange={(e) => setTerm(e.target.value)} placeholder="Código, cliente ou e-mail" />
+          <Search className="icon" /><input value={term} onChange={(e) => setTerm(e.target.value)} placeholder="Código, cliente ou e-mail" aria-label="Buscar pedidos" />
         </form>
+        </div>
       </div>
       <div className="subnav" style={{ padding: 0 }}>
         {FILTERS.map(([k, v]) => <button key={k} type="button" className={`chip ${status === k ? 'on' : ''}`} onClick={() => set({ status: k, pagina: '' })}>{v}</button>)}

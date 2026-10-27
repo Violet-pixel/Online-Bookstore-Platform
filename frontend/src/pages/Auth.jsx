@@ -42,7 +42,7 @@ export default function Auth({ mode }) {
         <div className="floaty" style={{ top: 150, left: 56 }}><BookCover title="O Último Bibliotecário" authors="Sofia Carvalho" style={7} /></div>
         <div className="floaty" style={{ top: 210, left: 236, width: 170 }}><BookCover title="Dom Casmurro" authors="Machado de Assis" style={2} /></div>
         <div className="floaty" style={{ top: 172, left: 434 }}><BookCover title="Orgulho e Preconceito" authors="Jane Austen" style={3} /></div>
-        <h2 className="misreg">{register ? 'Sua estante começa com uma conta.' : 'Que bom ver você de volta.'}</h2>
+        <h2>{register ? 'Sua estante começa com uma conta.' : 'Que bom ver você de volta.'}</h2>
         <p style={{ marginTop: 14, maxWidth: 420 }}>Acompanhe pedidos, salve endereços e pague com Pix, boleto ou cartão em até 6x.</p>
       </div>
       <div className="auth-form">

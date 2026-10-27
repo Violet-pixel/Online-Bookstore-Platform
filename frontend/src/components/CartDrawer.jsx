@@ -22,7 +22,7 @@ export default function CartDrawer() {
               <Truck size={16} />
               {missing > 0 ? <span>Faltam <b>{money(missing)}</b> para o frete grátis na entrega econômica</span> : <b>Você ganhou frete grátis na entrega econômica</b>}
             </div>
-            <div className="step done" style={{ gap: 0 }}><div className="bar"><i style={{ width: `${pct}%`, background: pct >= 100 ? 'var(--success)' : undefined }} /></div></div>
+            <div className="free-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} aria-label="Progresso até o frete grátis"><i className={pct >= 100 ? 'full' : ''} style={{ width: `${pct}%` }} /></div>
           </div>
           <div className="sum-row total"><span>Subtotal</span><span>{money(cart.subtotal)}</span></div>
           <button type="button" className="btn btn-primary btn-lg btn-block" onClick={() => { close(); navigate('/carrinho'); }}>

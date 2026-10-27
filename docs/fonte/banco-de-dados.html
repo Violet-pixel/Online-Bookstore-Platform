@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Prelo, banco de dados</title>
+<meta name="author" content="Clara Portes">
+<meta name="description" content="Diagrama de relacionamentos, tabelas, tipos nos quatro bancos e regras da arquitetura do banco do Prelo">
+<meta name="dcterms.created" content="2026-10-26">
+<link rel="stylesheet" href="base.css">
+<style>
+  /* Diagrama ER em página própria */
+  .er { break-before: page; }
+  .er img { width: 150mm; display: block; margin: 0 auto; border: 0; }
+  .er p.legend { font-size: 7.6pt; color: var(--muted); margin-top: 2mm; }
+  /* Cartões das tabelas (capítulo 3) */
+  .ents { margin: 2mm 0 4mm; }
+  .ents::after { content: ""; display: block; clear: both; }
+  .ent { float: left; width: 80mm; margin: 0 5mm 5mm 0; border: 0.7pt solid var(--ink); border-radius: 1.2mm; overflow: hidden; break-inside: avoid; background: #fff; }
+  .ent:nth-child(2n) { margin-right: 0; }
+  .ent .eh { background: var(--ink); color: #F4F2EF; font: 600 8.6pt var(--mono); padding: 1.4mm 2.4mm; }
+  .ent table { margin: 0; font-size: 7.2pt; }
+  .ent td { padding: 0.9mm 2.4mm; border-bottom: 0.4pt solid var(--line); }
+  .ent tr:last-child td { border-bottom: 0; }
+  .ent td.c { font-family: var(--mono); font-size: 7pt; }
+  .ent td.c .to { display: block; font-family: var(--font); font-size: 6.6pt; color: var(--malva); }
+  .ent td.t { color: var(--ink-2); white-space: nowrap; font-family: var(--mono); font-size: 6.8pt; }
+  .ent td.kk { width: 12mm; text-align: right; }
+  .ent .k { font: 650 6.2pt var(--font); color: var(--malva); background: var(--malva-soft); border-radius: 2mm; padding: 0 1.2mm; white-space: nowrap; }
+  /* Tabelas do capítulo 5 */
+  .tbl h3 { font-family: var(--mono); font-size: 11pt; font-weight: 600; letter-spacing: 0; margin-top: 6mm; }
+  table.fields td:first-child { width: 30mm; }
+  table.fields td:nth-child(2) { width: 23mm; font-family: var(--mono); font-size: 7.2pt; color: var(--ink-2); }
+  table.fields td:nth-child(3) { width: 9mm; }
+  table.fields td:nth-child(4) { width: 12mm; font-weight: 650; color: var(--malva); }
+  table.fields { font-size: 7.8pt; }
+  p.tnote { font-size: 7.6pt; color: var(--muted); margin-top: -3mm; }
+  table.types { font-size: 7.2pt; }
+  table.types td { font-family: var(--mono); font-size: 6.8pt; }
+  table.types td:first-child { font-family: var(--font); font-weight: 650; font-size: 7.2pt; }
+  /* Passos numerados */
+  ol.steps { list-style: none; padding: 0; counter-reset: st; margin: 2mm 0 4mm; }
+  ol.steps > li { counter-increment: st; position: relative; padding-left: 9mm; margin-bottom: 2mm; }
+  ol.steps > li::before { content: counter(st); position: absolute; left: 0; top: 0; width: 5.6mm; height: 5.6mm; border-radius: 50%; background: var(--malva); color: #fff; font: 650 7.4pt/5.6mm var(--font); text-align: center; }
+  /* Máquinas de estado */
+  .sm { margin: 2mm 0 4mm; padding: 4mm; background: var(--papel); border-radius: 2mm; break-inside: avoid; }
+  .sm .line { margin: 1.4mm 0; line-height: 2.1; }
+  .st { display: inline-block; font: 600 7.4pt var(--mono); padding: 0.6mm 2.2mm; border-radius: 1.2mm; background: #fff; border: 0.7pt solid var(--ink); }
+  .st.end { background: var(--ink); color: #F4F2EF; }
+  .st.fail { border-style: dashed; color: var(--ink-2); }
+  .st.start { border-radius: 50%; width: 3.2mm; height: 3.2mm; padding: 0; background: var(--ink); vertical-align: -0.6mm; }
+  .ar { display: inline-block; font-size: 7pt; color: var(--malva); margin: 0 1.6mm; }
+  .ar::after { content: " →"; }
+  .sm .from { display: inline-block; width: 30mm; font-size: 7pt; color: var(--muted); }
+  /* Problemas e backup */
+  table.wide td code { font-size: 6.8pt; }
+  .stack-2 > div { break-inside: avoid; }
+</style>
+</head>
+<body>
+<span class="doc-title">banco de dados</span><span class="doc-version">Versão 1.1.0, outubro de 2026</span>
+
+<!-- ===================== CAPA ===================== -->
+<div class="cover">
+  <div class="mark"><svg viewBox="0 0 120 120"><rect width="120" height="120" rx="28" fill="#EAEAEA"/><rect x="26" y="74" width="68" height="16" rx="4" fill="#212121"/><rect x="82" y="74" width="4" height="16" fill="#EAEAEA" opacity=".5"/><rect x="32" y="56" width="58" height="16" rx="4" fill="#B86B84"/><rect x="38" y="56" width="4" height="16" fill="#EAEAEA" opacity=".5"/><rect x="28" y="38" width="60" height="16" rx="4" fill="#E0B94F" transform="rotate(-6 58 46)"/><circle cx="72" cy="26" r="5" fill="#B86B84"/></svg></div>
+  <h1>Prelo</h1>
+  <div class="sub">Banco de dados</div>
+  <div class="desc">Diagrama de relacionamentos, as 18 tabelas com campos, tipos e chaves, os tipos equivalentes em PostgreSQL, MySQL, SQL Server e Oracle, máquinas de estado e as regras que a arquitetura do banco deve seguir.</div>
+  <div class="shelf"><span style="width:6mm;height:52mm;background:#2B2A33"></span><span style="width:7mm;height:66mm;background:#4E6178"></span><span style="width:5mm;height:46mm;background:#4A3956"></span><span style="width:9mm;height:62mm;background:#3F5F4B"></span><span style="width:5mm;height:56mm;background:#211F22"></span><span style="width:7mm;height:46mm;background:#8E3B59"></span><span style="width:7mm;height:52mm;background:#B86B84"></span><span style="width:5mm;height:46mm;background:#76805A"></span><span style="width:7mm;height:60mm;background:#EFE9DF"></span><span style="width:5mm;height:52mm;background:#D9D0C1"></span><span style="width:5mm;height:62mm;background:#E0B94F"></span><span style="width:7mm;height:46mm;background:#9C4A3C"></span><span style="width:9mm;height:62mm;background:#2B2A33"></span><span style="width:5mm;height:52mm;background:#4E6178"></span><span style="width:8mm;height:66mm;background:#4A3956"></span><span style="width:7mm;height:46mm;background:#3F5F4B"></span><span style="width:7mm;height:62mm;background:#211F22"></span><span style="width:7mm;height:46mm;background:#8E3B59"></span><span style="width:6mm;height:46mm;background:#B86B84"></span><span style="width:7mm;height:52mm;background:#76805A"></span><span style="width:6mm;height:60mm;background:#EFE9DF"></span><span style="width:6mm;height:62mm;background:#D9D0C1"></span><span style="width:5mm;height:62mm;background:#E0B94F"></span></div>
+  <div class="plank"></div>
+  <div class="foot">
+    <div><div class="author">Clara Portes</div>Copyright (©) 2026 Clara Portes, licença MIT</div>
+    <div class="right">Versão 1.1.0<br>Outubro de 2026</div>
+  </div>
+</div>
+
+<!-- ===================== SUMÁRIO ===================== -->
+<div class="toc-page">
+  <h2>Sumário</h2>
+  <nav class="toc"><ol>
+    <li class="ch"><a href="#ch-visao"><span class="n">1</span>Visão geral</a></li>
+    <li class="sub"><a href="#s-verdade">O banco é a fonte da verdade</a></li>
+    <li class="sub"><a href="#s-areas">Áreas do modelo</a></li>
+    <li class="sub"><a href="#s-bancos">Bancos suportados</a></li>
+    <li class="sub"><a href="#s-escolha">Como o banco é escolhido</a></li>
+    <li class="sub"><a href="#s-redis">O que fica no Redis</a></li>
+    <li class="ch"><a href="#ch-diagrama"><span class="n">2</span>Diagrama de relacionamentos</a></li>
+    <li class="sub"><a href="#s-card">Cardinalidades</a></li>
+    <li class="ch"><a href="#ch-areas"><span class="n">3</span>Áreas em detalhe</a></li>
+    <li class="sub"><a href="#s-contas">Contas e carrinho</a></li>
+    <li class="sub"><a href="#s-catalogo">Catálogo</a></li>
+    <li class="sub"><a href="#s-pedidos">Pedidos, pagamentos e envio</a></li>
+    <li class="ch"><a href="#ch-regras"><span class="n">4</span>Regras da arquitetura do banco</a></li>
+    <li class="sub"><a href="#s-nomes">Nomes</a></li>
+    <li class="sub"><a href="#s-tipos">Tipos portáveis</a></li>
+    <li class="sub"><a href="#s-chaves">Chaves e identidade</a></li>
+    <li class="sub"><a href="#s-bool">Booleanos</a></li>
+    <li class="sub"><a href="#s-datas">Datas e horas</a></li>
+    <li class="sub"><a href="#s-dinheiro">Dinheiro</a></li>
+    <li class="sub"><a href="#s-textos">Textos</a></li>
+    <li class="sub"><a href="#s-integridade">Integridade</a></li>
+    <li class="sub"><a href="#s-copias">Cópias no pedido</a></li>
+    <li class="sub"><a href="#s-concorrencia">Concorrência</a></li>
+    <li class="sub"><a href="#s-evolucao">Evolução do esquema</a></li>
+    <li class="ch"><a href="#ch-tabelas"><span class="n">5</span>Tabelas</a></li>
+    <li class="sub"><a href="#t-app_user">app_user</a></li><li class="sub"><a href="#t-address">address</a></li><li class="sub"><a href="#t-category">category</a></li><li class="sub"><a href="#t-author">author</a></li><li class="sub"><a href="#t-publisher">publisher</a></li><li class="sub"><a href="#t-book">book</a></li><li class="sub"><a href="#t-book_author">book_author</a></li><li class="sub"><a href="#t-curated_catalog">curated_catalog</a></li><li class="sub"><a href="#t-curated_catalog_book">curated_catalog_book</a></li><li class="sub"><a href="#t-cart">cart</a></li><li class="sub"><a href="#t-cart_item">cart_item</a></li><li class="sub"><a href="#t-shipping_method">shipping_method</a></li><li class="sub"><a href="#t-coupon">coupon</a></li><li class="sub"><a href="#t-purchase_order">purchase_order</a></li><li class="sub"><a href="#t-order_item">order_item</a></li><li class="sub"><a href="#t-payment">payment</a></li><li class="sub"><a href="#t-shipment">shipment</a></li><li class="sub"><a href="#t-shipment_event">shipment_event</a></li>
+    <li class="ch"><a href="#ch-quatro"><span class="n">6</span>Uma tabela nos quatro bancos</a></li>
+    <li class="ch"><a href="#ch-estados"><span class="n">7</span>Máquinas de estado</a></li>
+    <li class="sub"><a href="#s-sm-pedido">Pedido</a></li>
+    <li class="sub"><a href="#s-sm-pagamento">Pagamento</a></li>
+    <li class="sub"><a href="#s-sm-envio">Envio</a></li>
+    <li class="ch"><a href="#ch-compra"><span class="n">8</span>Uma compra passo a passo</a></li>
+    <li class="ch"><a href="#ch-consultas"><span class="n">9</span>Consultas úteis</a></li>
+    <li class="ch"><a href="#ch-preparar"><span class="n">10</span>Como preparar o banco</a></li>
+    <li class="ch"><a href="#ch-backup"><span class="n">11</span>Backup, restauração e problemas comuns</a></li>
+  </ol></nav>
+</div>
+
+<!-- ===================== 1 ===================== -->
+<section class="chapter" id="ch-visao">
+  <div class="chapter-head"><div class="num">Capítulo 1</div><h2>Visão geral</h2>
+    <p class="lede">O Prelo guarda tudo o que importa num banco relacional: contas, endereços, catálogo, carrinhos, pedidos, pagamentos e envios. São 18 tabelas, iguais nos quatro bancos suportados. O Redis só acelera e guarda o que é passageiro.</p></div>
+
+  <h3 id="s-verdade">O banco é a fonte da verdade</h3>
+  <p>Estoque, preços, pedidos e pagamentos só existem no banco. O Redis guarda cache, sessões e tokens de vida curta: se ele for apagado, ninguém perde um pedido, só precisa entrar de novo. Por isso o backup do Prelo é o backup do banco.</p>
+  <p>A lista Quero ler e os livros vistos por último, que a interface ganhou nesta versão, ficam no navegador de cada pessoa (armazenamento local) e não criam tabelas nem chaves no Redis.</p>
+
+  <h3 id="s-areas">Áreas do modelo</h3>
+  <table>
+    <thead><tr><th>Área</th><th>Tabelas</th><th>O que guarda</th></tr></thead>
+    <tbody>
+      <tr><td>Contas</td><td><code>app_user</code>, <code>address</code></td><td>Pessoas, papéis e endereços de entrega</td></tr>
+      <tr><td>Catálogo</td><td><code>book</code>, <code>author</code>, <code>book_author</code>, <code>publisher</code>, <code>category</code>, <code>curated_catalog</code>, <code>curated_catalog_book</code></td><td>Livros, autores, editoras, estantes e vitrines</td></tr>
+      <tr><td>Carrinho</td><td><code>cart</code>, <code>cart_item</code></td><td>O que cada conta pretende comprar</td></tr>
+      <tr><td>Pedidos</td><td><code>purchase_order</code>, <code>order_item</code>, <code>coupon</code></td><td>O que foi comprado, por quanto e para onde</td></tr>
+      <tr><td>Pagamentos</td><td><code>payment</code></td><td>Cada tentativa de pagamento e o seu resultado</td></tr>
+      <tr><td>Envio</td><td><code>shipping_method</code>, <code>shipment</code>, <code>shipment_event</code></td><td>Tabela de frete, envio de cada pedido e rastreio</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="s-bancos">Bancos suportados</h3>
+  <table>
+    <thead><tr><th>DB_VENDOR</th><th>Versões</th><th>Driver JDBC</th><th>Migrações</th></tr></thead>
+    <tbody>
+      <tr><td><code>postgresql</code></td><td>14 ou mais (CI no 16)</td><td><code>org.postgresql</code></td><td><code>db/migration/postgresql</code></td></tr>
+      <tr><td><code>mysql</code></td><td>8.0 ou mais (CI no 8.4)</td><td><code>com.mysql</code> (Connector/J)</td><td><code>db/migration/mysql</code></td></tr>
+      <tr><td><code>sqlserver</code></td><td>2019 ou mais (CI no 2022)</td><td><code>com.microsoft.sqlserver</code></td><td><code>db/migration/sqlserver</code></td></tr>
+      <tr><td><code>oracle</code></td><td>19c ou mais (CI no 23ai Free)</td><td><code>com.oracle.database.jdbc</code></td><td><code>db/migration/oracle</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="s-escolha">Como o banco é escolhido</h3>
+  <ol class="steps">
+    <li>A variável <code>DB_VENDOR</code> ativa o perfil do Spring com o mesmo nome: <code>application-postgresql.yml</code>, <code>application-mysql.yml</code>, <code>application-sqlserver.yml</code> ou <code>application-oracle.yml</code>. Cada um só define a URL JDBC.</li>
+    <li>O Hibernate detecta o dialeto pela conexão. As entidades JPA são as mesmas para todos.</li>
+    <li>O Flyway lê <code>classpath:db/migration/{vendor}</code>: o Spring troca <code>{vendor}</code> pelo nome do banco conectado e roda só as migrações daquela pasta.</li>
+    <li>No Docker, <code>COMPOSE_PROFILES</code> sobe só o contêiner do banco escolhido, sempre com o nome de rede <code>db</code>.</li>
+  </ol>
+
+  <h3 id="s-redis">O que fica no Redis</h3>
+  <table>
+    <thead><tr><th>Chave</th><th>Conteúdo</th><th>Vida</th></tr></thead>
+    <tbody>
+      <tr><td><code>livraria:cache:*</code></td><td>Vitrine, categorias, catálogos e detalhe dos livros</td><td>5 a 30 min</td></tr>
+      <tr><td><code>livraria:auth:refresh:*</code></td><td>Hash do token de renovação, com o id da conta</td><td>7 dias</td></tr>
+      <tr><td><code>livraria:auth:fail:*</code></td><td>Senhas erradas por e-mail</td><td>15 min</td></tr>
+      <tr><td><code>livraria:pay:card:*</code></td><td>Token do cartão: bandeira, 4 dígitos, resultado do sandbox</td><td>10 min</td></tr>
+      <tr><td><code>livraria:lock:*</code></td><td>Travas de tarefas (expiração de pedidos, carga inicial)</td><td>até 5 min</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===================== 2 ===================== -->
+<section class="chapter" id="ch-diagrama">
+  <div class="chapter-head"><div class="num">Capítulo 2</div><h2>Diagrama de relacionamentos</h2>
+    <p class="lede">Todas as tabelas, com chaves primárias (PK), estrangeiras (FK) e únicas (UK). Cada ligação sai da chave estrangeira, no lado muitos (pé de galinha), e chega na chave primária, no lado um (dois traços).</p></div>
+  <p>Só as chaves aparecem. As outras colunas estão no capítulo 3 e no capítulo 5. Um traço simples no lado do filho indica relação 1:1 (<code>cart</code> e <code>shipment</code>). <code>coupon</code> e <code>shipping_method</code> não têm chave estrangeira: o pedido copia o que valia na hora.</p>
+  <p>O diagrama da página seguinte sai de <code>docs/fonte/diagrama-er.mmd</code> (Mermaid). Depois de mudar o esquema, gere de novo com <code>mmdc -i diagrama-er.mmd -o diagrama-er.png -c diagrama-er.json -s 3 -b white</code>.</p>
+
+  <h3 id="s-card">Cardinalidades</h3>
+  <table>
+    <thead><tr><th>Tabela um</th><th>Relação</th><th>Tabela muitos</th><th>Pela coluna</th><th>Ao apagar o pai</th></tr></thead>
+    <tbody>
+      <tr><td><code>app_user</code></td><td>1:N</td><td><code>address</code></td><td><code>address.user_id</code></td><td>bloqueia</td></tr>
+      <tr><td><code>category</code></td><td>1:N</td><td><code>book</code></td><td><code>book.category_id</code></td><td>bloqueia</td></tr>
+      <tr><td><code>publisher</code></td><td>1:N</td><td><code>book</code></td><td><code>book.publisher_id</code></td><td>bloqueia</td></tr>
+      <tr><td><code>book</code></td><td>1:N</td><td><code>book_author</code></td><td><code>book_author.book_id</code></td><td>apaga junto</td></tr>
+      <tr><td><code>author</code></td><td>1:N</td><td><code>book_author</code></td><td><code>book_author.author_id</code></td><td>bloqueia</td></tr>
+      <tr><td><code>curated_catalog</code></td><td>1:N</td><td><code>curated_catalog_book</code></td><td><code>curated_catalog_book.catalog_id</code></td><td>apaga junto</td></tr>
+      <tr><td><code>book</code></td><td>1:N</td><td><code>curated_catalog_book</code></td><td><code>curated_catalog_book.book_id</code></td><td>bloqueia</td></tr>
+      <tr><td><code>app_user</code></td><td>1:1</td><td><code>cart</code></td><td><code>cart.user_id</code></td><td>bloqueia</td></tr>
+      <tr><td><code>cart</code></td><td>1:N</td><td><code>cart_item</code></td><td><code>cart_item.cart_id</code></td><td>apaga junto</td></tr>
+      <tr><td><code>book</code></td><td>1:N</td><td><code>cart_item</code></td><td><code>cart_item.book_id</code></td><td>bloqueia</td></tr>
+      <tr><td><code>app_user</code></td><td>1:N</td><td><code>purchase_order</code></td><td><code>purchase_order.user_id</code></td><td>bloqueia</td></tr>
+      <tr><td><code>purchase_order</code></td><td>1:N</td><td><code>order_item</code></td><td><code>order_item.order_id</code></td><td>apaga junto</td></tr>
+      <tr><td><code>book</code></td><td>1:N</td><td><code>order_item</code></td><td><code>order_item.book_id</code></td><td>bloqueia</td></tr>
+      <tr><td><code>purchase_order</code></td><td>1:N</td><td><code>payment</code></td><td><code>payment.order_id</code></td><td>bloqueia</td></tr>
+      <tr><td><code>purchase_order</code></td><td>1:1</td><td><code>shipment</code></td><td><code>shipment.order_id</code></td><td>bloqueia</td></tr>
+      <tr><td><code>shipment</code></td><td>1:N</td><td><code>shipment_event</code></td><td><code>shipment_event.shipment_id</code></td><td>apaga junto</td></tr>
+    </tbody>
+  </table>
+
+  <div class="er diagram">
+    <img src="diagrama-er.png" alt="Diagrama de relacionamentos das 18 tabelas do Prelo">
+    <p class="legend">Contas e carrinho no alto, pedidos, pagamentos e envio no meio, catálogo embaixo. <code>coupon</code> e <code>shipping_method</code> ficam soltos: são referência, sem chave estrangeira.</p>
+  </div>
+</section>
+
+<!-- ===================== 3 ===================== -->
+<section class="chapter" id="ch-areas">
+  <div class="chapter-head"><div class="num">Capítulo 3</div><h2>Áreas em detalhe</h2>
+    <p class="lede">Os mesmos relacionamentos, agora com todas as colunas e o tipo lógico de cada uma. O tipo com ? aceita nulo; a linha em malva abaixo de uma chave estrangeira diz para qual tabela ela aponta.</p></div>
+
+  <h3 id="s-contas">Contas e carrinho</h3>
+  <p>Uma conta tem vários endereços e um carrinho. O carrinho tem um item por livro; a quantidade fica no item.</p>
+  <div class="ents"><div class="ent"><div class="eh">app_user</div><table><tr><td class="c">id</td><td class="t">bigint</td><td class="kk"><span class="k">PK</span></td></tr><tr><td class="c">email</td><td class="t">varchar(160)</td><td class="kk"><span class="k">UK</span></td></tr><tr><td class="c">password_hash</td><td class="t">varchar(100)</td><td class="kk"></td></tr><tr><td class="c">full_name</td><td class="t">varchar(120)</td><td class="kk"></td></tr><tr><td class="c">phone</td><td class="t">varchar(20) ?</td><td class="kk"></td></tr><tr><td class="c">user_role</td><td class="t">varchar(20)</td><td class="kk"></td></tr><tr><td class="c">active</td><td class="t">0/1</td><td class="kk"></td></tr><tr><td class="c">created_at</td><td class="t">timestamp utc</td><td class="kk"></td></tr><tr><td class="c">last_login_at</td><td class="t">timestamp utc ?</td><td class="kk"></td></tr></table></div><div class="ent"><div class="eh">address</div><table><tr><td class="c">id</td><td class="t">bigint</td><td class="kk"><span class="k">PK</span></td></tr><tr><td class="c">user_id<span class="to">→ app_user</span></td><td class="t">bigint</td><td class="kk"><span class="k">FK</span></td></tr><tr><td class="c">label</td><td class="t">varchar(40)</td><td class="kk"></td></tr><tr><td class="c">recipient</td><td class="t">varchar(120)</td><td class="kk"></td></tr><tr><td class="c">zip_code</td><td class="t">varchar(9)</td><td class="kk"></td></tr><tr><td class="c">street</td><td class="t">varchar(160)</td><td class="kk"></td></tr><tr><td class="c">street_number</td><td class="t">varchar(20)</td><td class="kk"></td></tr><tr><td class="c">complement</td><td class="t">varchar(80) ?</td><td class="kk"></td></tr><tr><td class="c">district</td><td class="t">varchar(80)</td><td class="kk"></td></tr><tr><td class="c">city</td><td class="t">varchar(80)</td><td class="kk"></td></tr><tr><td class="c">state</td><td class="t">varchar(2)</td><td class="kk"></td></tr><tr><td class="c">is_default</td><td class="t">0/1</td><td class="kk"></td></tr><tr><td class="c">created_at</td><td class="t">timestamp utc</td><td class="kk"></td></tr></table></div><div class="ent"><div class="eh">cart</div><table><tr><td class="c">id</td><td class="t">bigint</td><td class="kk"><span class="k">PK</span></td></tr><tr><td class="c">user_id<span class="to">→ app_user</span></td><td class="t">bigint</td><td class="kk"><span class="k">FK UK</span></td></tr><tr><td class="c">updated_at</td><td class="t">timestamp utc</td><td class="kk"></td></tr></table></div><div class="ent"><div class="eh">cart_item</div><table><tr><td class="c">id</td><td class="t">bigint</td><td class="kk"><span class="k">PK</span></td></tr><tr><td class="c">cart_id<span class="to">→ cart</span></td><td class="t">bigint</td><td class="kk"><span class="k">FK</span></td></tr><tr><td class="c">book_id<span class="to">→ book</span></td><td class="t">bigint</td><td class="kk"><span class="k">FK</span></td></tr><tr><td class="c">quantity</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">added_at</td><td class="t">timestamp utc</td><td class="kk"></td></tr></table></div></div>
+
+  <h3 id="s-catalogo" class="page-break">Catálogo</h3>
+  <p>Cada livro pertence a uma categoria e a uma editora e tem um ou mais autores, em ordem. Os catálogos curados apontam para livros numa ordem própria. As duas tabelas de ligação usam a posição como parte da chave primária.</p>
+  <div class="ents"><div class="ent"><div class="eh">book</div><table><tr><td class="c">id</td><td class="t">bigint</td><td class="kk"><span class="k">PK</span></td></tr><tr><td class="c">isbn</td><td class="t">varchar(17)</td><td class="kk"><span class="k">UK</span></td></tr><tr><td class="c">title</td><td class="t">varchar(200)</td><td class="kk"></td></tr><tr><td class="c">subtitle</td><td class="t">varchar(200) ?</td><td class="kk"></td></tr><tr><td class="c">slug</td><td class="t">varchar(220)</td><td class="kk"><span class="k">UK</span></td></tr><tr><td class="c">synopsis</td><td class="t">varchar(4000) ?</td><td class="kk"></td></tr><tr><td class="c">category_id<span class="to">→ category</span></td><td class="t">bigint</td><td class="kk"><span class="k">FK</span></td></tr><tr><td class="c">publisher_id<span class="to">→ publisher</span></td><td class="t">bigint</td><td class="kk"><span class="k">FK</span></td></tr><tr><td class="c">language_code</td><td class="t">varchar(5)</td><td class="kk"></td></tr><tr><td class="c">page_count</td><td class="t">int ?</td><td class="kk"></td></tr><tr><td class="c">published_year</td><td class="t">int ?</td><td class="kk"></td></tr><tr><td class="c">book_format</td><td class="t">varchar(20)</td><td class="kk"></td></tr><tr><td class="c">price</td><td class="t">decimal(12,2)</td><td class="kk"></td></tr><tr><td class="c">list_price</td><td class="t">decimal(12,2)</td><td class="kk"></td></tr><tr><td class="c">stock_quantity</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">weight_grams</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">cover_style</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">rating_average</td><td class="t">decimal(3,2)</td><td class="kk"></td></tr><tr><td class="c">rating_count</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">sold_count</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">active</td><td class="t">0/1</td><td class="kk"></td></tr><tr><td class="c">search_text</td><td class="t">varchar(1000)</td><td class="kk"></td></tr><tr><td class="c">created_at</td><td class="t">timestamp utc</td><td class="kk"></td></tr><tr><td class="c">updated_at</td><td class="t">timestamp utc</td><td class="kk"></td></tr></table></div><div class="ent"><div class="eh">category</div><table><tr><td class="c">id</td><td class="t">bigint</td><td class="kk"><span class="k">PK</span></td></tr><tr><td class="c">name</td><td class="t">varchar(80)</td><td class="kk"><span class="k">UK</span></td></tr><tr><td class="c">slug</td><td class="t">varchar(90)</td><td class="kk"><span class="k">UK</span></td></tr><tr><td class="c">description</td><td class="t">varchar(400) ?</td><td class="kk"></td></tr><tr><td class="c">accent</td><td class="t">varchar(7)</td><td class="kk"></td></tr><tr><td class="c">sort_order</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">active</td><td class="t">0/1</td><td class="kk"></td></tr></table></div><div class="ent"><div class="eh">publisher</div><table><tr><td class="c">id</td><td class="t">bigint</td><td class="kk"><span class="k">PK</span></td></tr><tr><td class="c">name</td><td class="t">varchar(120)</td><td class="kk"><span class="k">UK</span></td></tr><tr><td class="c">slug</td><td class="t">varchar(130)</td><td class="kk"><span class="k">UK</span></td></tr></table></div><div class="ent"><div class="eh">book_author</div><table><tr><td class="c">book_id<span class="to">→ book</span></td><td class="t">bigint</td><td class="kk"><span class="k">PK FK</span></td></tr><tr><td class="c">author_id<span class="to">→ author</span></td><td class="t">bigint</td><td class="kk"><span class="k">FK</span></td></tr><tr><td class="c">author_order</td><td class="t">int</td><td class="kk"><span class="k">PK</span></td></tr></table></div><div class="ent"><div class="eh">author</div><table><tr><td class="c">id</td><td class="t">bigint</td><td class="kk"><span class="k">PK</span></td></tr><tr><td class="c">name</td><td class="t">varchar(120)</td><td class="kk"></td></tr><tr><td class="c">slug</td><td class="t">varchar(130)</td><td class="kk"><span class="k">UK</span></td></tr><tr><td class="c">bio</td><td class="t">varchar(1000) ?</td><td class="kk"></td></tr></table></div><div class="ent"><div class="eh">curated_catalog_book</div><table><tr><td class="c">catalog_id<span class="to">→ curated_catalog</span></td><td class="t">bigint</td><td class="kk"><span class="k">PK FK</span></td></tr><tr><td class="c">book_id<span class="to">→ book</span></td><td class="t">bigint</td><td class="kk"><span class="k">FK</span></td></tr><tr><td class="c">item_position</td><td class="t">int</td><td class="kk"><span class="k">PK</span></td></tr></table></div><div class="ent"><div class="eh">curated_catalog</div><table><tr><td class="c">id</td><td class="t">bigint</td><td class="kk"><span class="k">PK</span></td></tr><tr><td class="c">name</td><td class="t">varchar(80)</td><td class="kk"></td></tr><tr><td class="c">slug</td><td class="t">varchar(90)</td><td class="kk"><span class="k">UK</span></td></tr><tr><td class="c">description</td><td class="t">varchar(400) ?</td><td class="kk"></td></tr><tr><td class="c">highlight</td><td class="t">varchar(160) ?</td><td class="kk"></td></tr><tr><td class="c">sort_order</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">active</td><td class="t">0/1</td><td class="kk"></td></tr></table></div></div>
+
+  <h3 id="s-pedidos">Pedidos, pagamentos e envio</h3>
+  <p>O pedido é o centro: tem itens, várias tentativas de pagamento e, depois de pago, um envio com a sua linha do tempo. Formas de envio e cupons são tabelas de referência: o pedido guarda uma cópia do que valia na hora, sem chave estrangeira para elas.</p>
+  <div class="ents"><div class="ent"><div class="eh">purchase_order</div><table><tr><td class="c">id</td><td class="t">bigint</td><td class="kk"><span class="k">PK</span></td></tr><tr><td class="c">code</td><td class="t">varchar(20)</td><td class="kk"><span class="k">UK</span></td></tr><tr><td class="c">user_id<span class="to">→ app_user</span></td><td class="t">bigint</td><td class="kk"><span class="k">FK</span></td></tr><tr><td class="c">order_status</td><td class="t">varchar(20)</td><td class="kk"></td></tr><tr><td class="c">subtotal</td><td class="t">decimal(12,2)</td><td class="kk"></td></tr><tr><td class="c">discount</td><td class="t">decimal(12,2)</td><td class="kk"></td></tr><tr><td class="c">shipping_fee</td><td class="t">decimal(12,2)</td><td class="kk"></td></tr><tr><td class="c">total</td><td class="t">decimal(12,2)</td><td class="kk"></td></tr><tr><td class="c">coupon_code</td><td class="t">varchar(30) ?</td><td class="kk"></td></tr><tr><td class="c">item_count</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">ship_recipient</td><td class="t">varchar(120)</td><td class="kk"></td></tr><tr><td class="c">ship_zip_code</td><td class="t">varchar(9)</td><td class="kk"></td></tr><tr><td class="c">ship_street</td><td class="t">varchar(160)</td><td class="kk"></td></tr><tr><td class="c">ship_number</td><td class="t">varchar(20)</td><td class="kk"></td></tr><tr><td class="c">ship_complement</td><td class="t">varchar(80) ?</td><td class="kk"></td></tr><tr><td class="c">ship_district</td><td class="t">varchar(80)</td><td class="kk"></td></tr><tr><td class="c">ship_city</td><td class="t">varchar(80)</td><td class="kk"></td></tr><tr><td class="c">ship_state</td><td class="t">varchar(2)</td><td class="kk"></td></tr><tr><td class="c">shipping_method_code</td><td class="t">varchar(20)</td><td class="kk"></td></tr><tr><td class="c">shipping_method_name</td><td class="t">varchar(60)</td><td class="kk"></td></tr><tr><td class="c">shipping_carrier</td><td class="t">varchar(60)</td><td class="kk"></td></tr><tr><td class="c">shipping_min_days</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">shipping_max_days</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">placed_at</td><td class="t">timestamp utc</td><td class="kk"></td></tr><tr><td class="c">payment_due_at</td><td class="t">timestamp utc</td><td class="kk"></td></tr><tr><td class="c">paid_at</td><td class="t">timestamp utc ?</td><td class="kk"></td></tr><tr><td class="c">canceled_at</td><td class="t">timestamp utc ?</td><td class="kk"></td></tr><tr><td class="c">cancel_reason</td><td class="t">varchar(200) ?</td><td class="kk"></td></tr><tr><td class="c">version</td><td class="t">bigint</td><td class="kk"></td></tr></table></div><div class="ent"><div class="eh">order_item</div><table><tr><td class="c">id</td><td class="t">bigint</td><td class="kk"><span class="k">PK</span></td></tr><tr><td class="c">order_id<span class="to">→ purchase_order</span></td><td class="t">bigint</td><td class="kk"><span class="k">FK</span></td></tr><tr><td class="c">book_id<span class="to">→ book</span></td><td class="t">bigint</td><td class="kk"><span class="k">FK</span></td></tr><tr><td class="c">book_slug</td><td class="t">varchar(220)</td><td class="kk"></td></tr><tr><td class="c">book_title</td><td class="t">varchar(200)</td><td class="kk"></td></tr><tr><td class="c">book_authors</td><td class="t">varchar(300) ?</td><td class="kk"></td></tr><tr><td class="c">book_isbn</td><td class="t">varchar(17)</td><td class="kk"></td></tr><tr><td class="c">cover_style</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">unit_price</td><td class="t">decimal(12,2)</td><td class="kk"></td></tr><tr><td class="c">quantity</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">line_total</td><td class="t">decimal(12,2)</td><td class="kk"></td></tr></table></div><div class="ent"><div class="eh">payment</div><table><tr><td class="c">id</td><td class="t">bigint</td><td class="kk"><span class="k">PK</span></td></tr><tr><td class="c">order_id<span class="to">→ purchase_order</span></td><td class="t">bigint</td><td class="kk"><span class="k">FK</span></td></tr><tr><td class="c">payment_method</td><td class="t">varchar(20)</td><td class="kk"></td></tr><tr><td class="c">payment_status</td><td class="t">varchar(20)</td><td class="kk"></td></tr><tr><td class="c">amount</td><td class="t">decimal(12,2)</td><td class="kk"></td></tr><tr><td class="c">installments</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">card_brand</td><td class="t">varchar(20) ?</td><td class="kk"></td></tr><tr><td class="c">card_last4</td><td class="t">varchar(4) ?</td><td class="kk"></td></tr><tr><td class="c">pix_payload</td><td class="t">varchar(400) ?</td><td class="kk"></td></tr><tr><td class="c">boleto_line</td><td class="t">varchar(60) ?</td><td class="kk"></td></tr><tr><td class="c">gateway_reference</td><td class="t">varchar(40)</td><td class="kk"><span class="k">UK</span></td></tr><tr><td class="c">idempotency_key</td><td class="t">varchar(80)</td><td class="kk"><span class="k">UK</span></td></tr><tr><td class="c">failure_reason</td><td class="t">varchar(200) ?</td><td class="kk"></td></tr><tr><td class="c">expires_at</td><td class="t">timestamp utc ?</td><td class="kk"></td></tr><tr><td class="c">created_at</td><td class="t">timestamp utc</td><td class="kk"></td></tr><tr><td class="c">confirmed_at</td><td class="t">timestamp utc ?</td><td class="kk"></td></tr></table></div><div class="ent"><div class="eh">shipment</div><table><tr><td class="c">id</td><td class="t">bigint</td><td class="kk"><span class="k">PK</span></td></tr><tr><td class="c">order_id<span class="to">→ purchase_order</span></td><td class="t">bigint</td><td class="kk"><span class="k">FK UK</span></td></tr><tr><td class="c">carrier</td><td class="t">varchar(60)</td><td class="kk"></td></tr><tr><td class="c">service_name</td><td class="t">varchar(60)</td><td class="kk"></td></tr><tr><td class="c">tracking_code</td><td class="t">varchar(30) ?</td><td class="kk"></td></tr><tr><td class="c">shipment_status</td><td class="t">varchar(20)</td><td class="kk"></td></tr><tr><td class="c">estimated_delivery</td><td class="t">date ?</td><td class="kk"></td></tr><tr><td class="c">shipped_at</td><td class="t">timestamp utc ?</td><td class="kk"></td></tr><tr><td class="c">delivered_at</td><td class="t">timestamp utc ?</td><td class="kk"></td></tr><tr><td class="c">created_at</td><td class="t">timestamp utc</td><td class="kk"></td></tr><tr><td class="c">updated_at</td><td class="t">timestamp utc</td><td class="kk"></td></tr></table></div><div class="ent"><div class="eh">shipment_event</div><table><tr><td class="c">id</td><td class="t">bigint</td><td class="kk"><span class="k">PK</span></td></tr><tr><td class="c">shipment_id<span class="to">→ shipment</span></td><td class="t">bigint</td><td class="kk"><span class="k">FK</span></td></tr><tr><td class="c">shipment_status</td><td class="t">varchar(20)</td><td class="kk"></td></tr><tr><td class="c">title</td><td class="t">varchar(120)</td><td class="kk"></td></tr><tr><td class="c">detail</td><td class="t">varchar(300) ?</td><td class="kk"></td></tr><tr><td class="c">location</td><td class="t">varchar(120) ?</td><td class="kk"></td></tr><tr><td class="c">occurred_at</td><td class="t">timestamp utc</td><td class="kk"></td></tr></table></div><div class="ent"><div class="eh">shipping_method</div><table><tr><td class="c">id</td><td class="t">bigint</td><td class="kk"><span class="k">PK</span></td></tr><tr><td class="c">code</td><td class="t">varchar(20)</td><td class="kk"><span class="k">UK</span></td></tr><tr><td class="c">name</td><td class="t">varchar(60)</td><td class="kk"></td></tr><tr><td class="c">carrier</td><td class="t">varchar(60)</td><td class="kk"></td></tr><tr><td class="c">description</td><td class="t">varchar(200) ?</td><td class="kk"></td></tr><tr><td class="c">base_fee</td><td class="t">decimal(12,2)</td><td class="kk"></td></tr><tr><td class="c">fee_per_kg</td><td class="t">decimal(12,2)</td><td class="kk"></td></tr><tr><td class="c">free_above</td><td class="t">decimal(12,2) ?</td><td class="kk"></td></tr><tr><td class="c">min_days</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">max_days</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">sort_order</td><td class="t">int</td><td class="kk"></td></tr><tr><td class="c">active</td><td class="t">0/1</td><td class="kk"></td></tr></table></div><div class="ent"><div class="eh">coupon</div><table><tr><td class="c">id</td><td class="t">bigint</td><td class="kk"><span class="k">PK</span></td></tr><tr><td class="c">code</td><td class="t">varchar(30)</td><td class="kk"><span class="k">UK</span></td></tr><tr><td class="c">description</td><td class="t">varchar(160)</td><td class="kk"></td></tr><tr><td class="c">discount_type</td><td class="t">varchar(10)</td><td class="kk"></td></tr><tr><td class="c">discount_value</td><td class="t">decimal(12,2)</td><td class="kk"></td></tr><tr><td class="c">min_subtotal</td><td class="t">decimal(12,2)</td><td class="kk"></td></tr><tr><td class="c">valid_until</td><td class="t">timestamp utc ?</td><td class="kk"></td></tr><tr><td class="c">active</td><td class="t">0/1</td><td class="kk"></td></tr></table></div></div>
+</section>
+
+<!-- ===================== 4 ===================== -->
+<section class="chapter" id="ch-regras">
+  <div class="chapter-head"><div class="num">Capítulo 4</div><h2>Regras da arquitetura do banco</h2>
+    <p class="lede">O que toda tabela, coluna e migração do Prelo precisa seguir para continuar funcionando igual nos quatro bancos. Vale para quem for evoluir o esquema.</p></div>
+
+  <h3 id="s-nomes">Nomes</h3>
+  <ul>
+    <li>Tabelas e colunas em inglês, <code>snake_case</code>, no singular (<code>book</code>, <code>order_item</code>). O Hibernate converte os campos Java (<code>stockQuantity</code>) para esse formato.</li>
+    <li>Nenhuma palavra reservada em nenhum dos quatro bancos. Por isso <code>app_user</code> (e não <code>user</code>), <code>purchase_order</code> (e não <code>order</code>), <code>user_role</code>, <code>book_format</code>, <code>item_position</code>, <code>curated_catalog</code>.</li>
+    <li>Restrições sempre com nome explícito e único no esquema: <code>pk_&lt;tabela&gt;</code>, <code>fk_&lt;tabela&gt;_&lt;coluna&gt;</code>, <code>uk_&lt;tabela&gt;_&lt;colunas&gt;</code>, <code>ix_&lt;tabela&gt;_&lt;colunas&gt;</code>. Nomes gerados pelo banco mudam de um para outro e atrapalham migrações futuras.</li>
+    <li>Nomes com até 30 caracteres, para caber em qualquer versão do Oracle.</li>
+  </ul>
+
+  <h3 id="s-tipos">Tipos portáveis</h3>
+  <p>Cada coluna usa um tipo lógico, que vira o tipo nativo de cada banco. Use só estes:</p>
+  <table class="types">
+    <thead><tr><th>Lógico</th><th>Java</th><th>PostgreSQL</th><th>MySQL</th><th>SQL Server</th><th>Oracle</th></tr></thead>
+    <tbody>
+      <tr><td>BIGINT IDENTITY</td><td>Long</td><td>BIGINT GENERATED BY DEFAULT AS IDENTITY</td><td>BIGINT AUTO_INCREMENT</td><td>BIGINT IDENTITY(1,1)</td><td>NUMBER(19) GENERATED BY DEFAULT ON NULL AS IDENTITY</td></tr>
+      <tr><td>BIGINT</td><td>Long</td><td>BIGINT</td><td>BIGINT</td><td>BIGINT</td><td>NUMBER(19)</td></tr>
+      <tr><td>INT</td><td>Integer</td><td>INTEGER</td><td>INT</td><td>INT</td><td>NUMBER(10)</td></tr>
+      <tr><td>0/1</td><td>Boolean (Flag)</td><td>SMALLINT</td><td>SMALLINT</td><td>SMALLINT</td><td>NUMBER(1)</td></tr>
+      <tr><td>DECIMAL(12,2)</td><td>BigDecimal</td><td>NUMERIC(12,2)</td><td>DECIMAL(12,2)</td><td>DECIMAL(12,2)</td><td>NUMBER(12,2)</td></tr>
+      <tr><td>DECIMAL(3,2)</td><td>BigDecimal</td><td>NUMERIC(3,2)</td><td>DECIMAL(3,2)</td><td>DECIMAL(3,2)</td><td>NUMBER(3,2)</td></tr>
+      <tr><td>TIMESTAMP UTC</td><td>Instant</td><td>TIMESTAMP(6) WITH TIME ZONE</td><td>DATETIME(6)</td><td>DATETIMEOFFSET(6)</td><td>TIMESTAMP(6) WITH TIME ZONE</td></tr>
+      <tr><td>DATE</td><td>LocalDate</td><td>DATE</td><td>DATE</td><td>DATE</td><td>DATE</td></tr>
+      <tr><td>VARCHAR(n)</td><td>String</td><td>VARCHAR(n)</td><td>VARCHAR(n) utf8mb4</td><td>NVARCHAR(n)</td><td>VARCHAR2(n CHAR)</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="s-chaves">Chaves e identidade</h3>
+  <ul>
+    <li>Toda tabela de entidade tem <code>id</code> numérico gerado pelo banco (<code>GenerationType.IDENTITY</code>). Não use sequências nem UUID gerado no banco: a identidade é o único mecanismo igual nos quatro.</li>
+    <li>Tabelas de ligação com ordem usam chave composta (<code>book_id, author_order</code>), que o JPA mantém com <code>@OrderColumn</code>.</li>
+    <li>Códigos que aparecem para pessoas (pedido, cupom, referência do pagamento) são colunas únicas separadas do <code>id</code>.</li>
+  </ul>
+
+  <h3 id="s-bool">Booleanos</h3>
+  <p>Não existe tipo booleano comum aos quatro (o Oracle só tem a partir do 23ai). Todo booleano é numérico, com 0 ou 1, e passa pelo conversor <code>Flag</code> (<code>@Convert(converter = Flag.class)</code>). Nunca crie coluna <code>BOOLEAN</code>, <code>BIT</code> ou <code>TINYINT(1)</code> direto.</p>
+
+  <h3 id="s-datas">Datas e horas</h3>
+  <ul>
+    <li>Momentos são <code>java.time.Instant</code> gravados em UTC (<code>hibernate.jdbc.time_zone=UTC</code>). A interface converte para o horário de Brasília na hora de mostrar.</li>
+    <li>Datas sem hora (previsão de entrega) são <code>LocalDate</code> em <code>DATE</code>.</li>
+    <li>Nunca use <code>DEFAULT CURRENT_TIMESTAMP</code> nem gatilhos. A aplicação preenche as datas, para o valor ser o mesmo em todos os bancos e nos testes.</li>
+  </ul>
+
+  <h3 id="s-dinheiro">Dinheiro</h3>
+  <p>Valores em reais são <code>DECIMAL(12,2)</code> (<code>NUMBER(12,2)</code> no Oracle) e <code>BigDecimal</code> no Java, com arredondamento <code>HALF_EVEN</code> em duas casas. Nunca use <code>FLOAT</code>, <code>DOUBLE</code> ou <code>MONEY</code>.</p>
+
+  <h3 id="s-textos">Textos</h3>
+  <ul>
+    <li>Todo texto tem tamanho máximo e cabe em 4000 caracteres. Não há <code>TEXT</code>, <code>CLOB</code> ou <code>@Lob</code>: cada banco trata objetos grandes de um jeito, e o PostgreSQL ainda separa <code>@Lob</code> em outra área.</li>
+    <li>Unicode em todos: <code>utf8mb4</code> no MySQL, <code>NVARCHAR</code> no SQL Server (com <code>use_nationalized_character_data</code>), <code>VARCHAR2(n CHAR)</code> no Oracle (tamanho em caracteres, não em bytes).</li>
+    <li>A busca sem acentos não depende de collation. A coluna <code>book.search_text</code> é preenchida pela aplicação já sem acentos e em minúsculas, e a busca usa <code>LIKE</code> sobre ela.</li>
+  </ul>
+
+  <h3 id="s-integridade">Integridade</h3>
+  <ul>
+    <li>Toda referência entre tabelas tem chave estrangeira declarada.</li>
+    <li><code>ON DELETE CASCADE</code> só onde o filho não existe sem o pai (itens do carrinho, autores do livro, livros do catálogo, itens do pedido, eventos do envio). O resto bloqueia a exclusão, e livros saem da loja com <code>active = 0</code>.</li>
+    <li>Unicidade só em colunas <code>NOT NULL</code>: o SQL Server aceita um único nulo numa coluna única, os outros aceitam vários.</li>
+    <li>Toda chave estrangeira tem índice (o Oracle e o PostgreSQL não criam sozinhos).</li>
+  </ul>
+
+  <h3 id="s-copias">Cópias no pedido</h3>
+  <p>O pedido não depende de dados que mudam. Endereço, forma de envio, prazos, título, ISBN, autores e preço são copiados para <code>purchase_order</code> e <code>order_item</code> no fechamento. Mudar o endereço ou o preço de um livro não altera pedidos antigos.</p>
+
+  <h3 id="s-concorrencia">Concorrência</h3>
+  <dl class="def">
+    <div class="item"><dt>Estoque</dt><dd>A reserva é um único comando <code>UPDATE book SET stock_quantity = stock_quantity - :qtd WHERE id = :id AND stock_quantity &gt;= :qtd</code>. Se nenhuma linha mudar, falta estoque. Os livros são reservados em ordem de <code>id</code> para evitar deadlock.</dd></div>
+    <div class="item"><dt>Pedido</dt><dd><code>purchase_order.version</code> (JPA <code>@Version</code>) impede que um pagamento e a expiração alterem o mesmo pedido ao mesmo tempo.</dd></div>
+    <div class="item"><dt>Pagamento</dt><dd><code>payment.idempotency_key</code> é única: a mesma tentativa repetida devolve o pagamento já criado.</dd></div>
+  </dl>
+
+  <h3 id="s-evolucao">Evolução do esquema</h3>
+  <div class="note warn"><b class="t">Checklist de uma migração</b>
+    Mesmo número nas quatro pastas. Só tipos lógicos; nomes <code>pk_</code>, <code>fk_</code>, <code>uk_</code> e <code>ix_</code>; índice em toda FK. Nada de <code>BOOLEAN</code>, LOB, <code>FLOAT</code> ou <code>DEFAULT</code> de data. Entidade atualizada e <code>mvn verify</code> passando nos quatro bancos.</div>
+  <ol class="steps">
+    <li>Nunca edite uma migração que já rodou em algum lugar: o Flyway confere o checksum e para a aplicação.</li>
+    <li>Uma mudança é uma nova versão, com o mesmo número e o mesmo nome nas quatro pastas: <code>V2__descricao.sql</code> em <code>postgresql</code>, <code>mysql</code>, <code>sqlserver</code> e <code>oracle</code>.</li>
+    <li>Use só os tipos lógicos da tabela acima e dê nome a toda restrição nova.</li>
+    <li>Atualize a entidade JPA na mesma mudança e rode os testes. O <code>SchemaValidationTest</code> compara entidade e tabela no PostgreSQL e no MySQL, e o CI roda tudo nos quatro bancos.</li>
+    <li>Prefira mudanças compatíveis (coluna nova aceitando nulo, depois preencher, depois exigir), para a versão anterior da API continuar funcionando durante a atualização.</li>
+  </ol>
+</section>
+
+<!-- ===================== 5 ===================== -->
+<section class="chapter" id="ch-tabelas">
+  <div class="chapter-head"><div class="num">Capítulo 5</div><h2>Tabelas</h2>
+    <p class="lede">Cada tabela com os campos, o tipo lógico (o capítulo 4 mostra o tipo em cada banco), se aceita nulo, a chave e o que guarda.</p></div>
+  <div class="tbl" id="t-app_user"><h3>app_user</h3><p>Contas de clientes e da equipe da livraria.</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code></td><td>bigint</td><td>não</td><td>PK</td><td>Identificador gerado pelo banco (identidade)</td></tr><tr><td><code>email</code></td><td>varchar(160)</td><td>não</td><td>UK</td><td>E-mail de login, sempre em minúsculas</td></tr><tr><td><code>password_hash</code></td><td>varchar(100)</td><td>não</td><td></td><td>Senha com BCrypt</td></tr><tr><td><code>full_name</code></td><td>varchar(120)</td><td>não</td><td></td><td>Nome completo</td></tr><tr><td><code>phone</code></td><td>varchar(20)</td><td>sim</td><td></td><td>Telefone (opcional)</td></tr><tr><td><code>user_role</code></td><td>varchar(20)</td><td>não</td><td></td><td><code>CUSTOMER</code> ou <code>ADMIN</code></td></tr><tr><td><code>active</code></td><td>0/1</td><td>não</td><td></td><td>1 = ativo, 0 = desativado (exclusão lógica)</td></tr><tr><td><code>created_at</code></td><td>timestamp utc</td><td>não</td><td></td><td>Quando foi criado (UTC)</td></tr><tr><td><code>last_login_at</code></td><td>timestamp utc</td><td>sim</td><td></td><td>Último login (UTC)</td></tr></tbody></table></div><div class="tbl" id="t-address"><h3>address</h3><p>Endereços de entrega de cada conta (até 10 por conta).</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code></td><td>bigint</td><td>não</td><td>PK</td><td>Identificador gerado pelo banco (identidade)</td></tr><tr><td><code>user_id</code></td><td>bigint</td><td>não</td><td>FK</td><td>Conta dona do registro</td></tr><tr><td><code>label</code></td><td>varchar(40)</td><td>não</td><td></td><td>Nome do endereço (Casa, Trabalho...)</td></tr><tr><td><code>recipient</code></td><td>varchar(120)</td><td>não</td><td></td><td>Quem recebe</td></tr><tr><td><code>zip_code</code></td><td>varchar(9)</td><td>não</td><td></td><td>CEP no formato 00000-000</td></tr><tr><td><code>street</code></td><td>varchar(160)</td><td>não</td><td></td><td>Rua</td></tr><tr><td><code>street_number</code></td><td>varchar(20)</td><td>não</td><td></td><td>Número</td></tr><tr><td><code>complement</code></td><td>varchar(80)</td><td>sim</td><td></td><td>Complemento</td></tr><tr><td><code>district</code></td><td>varchar(80)</td><td>não</td><td></td><td>Bairro</td></tr><tr><td><code>city</code></td><td>varchar(80)</td><td>não</td><td></td><td>Cidade</td></tr><tr><td><code>state</code></td><td>varchar(2)</td><td>não</td><td></td><td>UF</td></tr><tr><td><code>is_default</code></td><td>0/1</td><td>não</td><td></td><td>1 = endereço principal da conta</td></tr><tr><td><code>created_at</code></td><td>timestamp utc</td><td>não</td><td></td><td>Quando foi criado (UTC)</td></tr></tbody></table><p class="tnote">Índice (user_id). <code>user_id</code> referencia <code>app_user(id)</code>.</p></div><div class="tbl" id="t-category"><h3>category</h3><p>Categorias do catálogo (estantes).</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code></td><td>bigint</td><td>não</td><td>PK</td><td>Identificador gerado pelo banco (identidade)</td></tr><tr><td><code>name</code></td><td>varchar(80)</td><td>não</td><td>UK</td><td>Nome exibido</td></tr><tr><td><code>slug</code></td><td>varchar(90)</td><td>não</td><td>UK</td><td>Identificador legível usado nas URLs</td></tr><tr><td><code>description</code></td><td>varchar(400)</td><td>sim</td><td></td><td>Texto de apoio</td></tr><tr><td><code>accent</code></td><td>varchar(7)</td><td>não</td><td></td><td>Cor da categoria na interface (#RRGGBB)</td></tr><tr><td><code>sort_order</code></td><td>int</td><td>não</td><td></td><td>Ordem de exibição</td></tr><tr><td><code>active</code></td><td>0/1</td><td>não</td><td></td><td>1 = ativo, 0 = desativado (exclusão lógica)</td></tr></tbody></table></div><div class="tbl" id="t-author"><h3>author</h3><p>Autores. Um livro pode ter vários, em ordem.</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code></td><td>bigint</td><td>não</td><td>PK</td><td>Identificador gerado pelo banco (identidade)</td></tr><tr><td><code>name</code></td><td>varchar(120)</td><td>não</td><td></td><td>Nome exibido</td></tr><tr><td><code>slug</code></td><td>varchar(130)</td><td>não</td><td>UK</td><td>Identificador legível usado nas URLs</td></tr><tr><td><code>bio</code></td><td>varchar(1000)</td><td>sim</td><td></td><td>Biografia curta</td></tr></tbody></table></div><div class="tbl" id="t-publisher"><h3>publisher</h3><p>Editoras.</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code></td><td>bigint</td><td>não</td><td>PK</td><td>Identificador gerado pelo banco (identidade)</td></tr><tr><td><code>name</code></td><td>varchar(120)</td><td>não</td><td>UK</td><td>Nome exibido</td></tr><tr><td><code>slug</code></td><td>varchar(130)</td><td>não</td><td>UK</td><td>Identificador legível usado nas URLs</td></tr></tbody></table></div><div class="tbl" id="t-book"><h3>book</h3><p>Livros à venda, com preço, estoque e a coluna de busca sem acentos.</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code></td><td>bigint</td><td>não</td><td>PK</td><td>Identificador gerado pelo banco (identidade)</td></tr><tr><td><code>isbn</code></td><td>varchar(17)</td><td>não</td><td>UK</td><td>ISBN-13 com hífens</td></tr><tr><td><code>title</code></td><td>varchar(200)</td><td>não</td><td></td><td>Título</td></tr><tr><td><code>subtitle</code></td><td>varchar(200)</td><td>sim</td><td></td><td>Subtítulo</td></tr><tr><td><code>slug</code></td><td>varchar(220)</td><td>não</td><td>UK</td><td>Identificador legível usado nas URLs</td></tr><tr><td><code>synopsis</code></td><td>varchar(4000)</td><td>sim</td><td></td><td>Sinopse (até 4000 caracteres)</td></tr><tr><td><code>category_id</code></td><td>bigint</td><td>não</td><td>FK</td><td>Categoria do livro</td></tr><tr><td><code>publisher_id</code></td><td>bigint</td><td>não</td><td>FK</td><td>Editora do livro</td></tr><tr><td><code>language_code</code></td><td>varchar(5)</td><td>não</td><td></td><td>Idioma (pt-BR, en...)</td></tr><tr><td><code>page_count</code></td><td>int</td><td>sim</td><td></td><td>Número de páginas</td></tr><tr><td><code>published_year</code></td><td>int</td><td>sim</td><td></td><td>Ano de publicação</td></tr><tr><td><code>book_format</code></td><td>varchar(20)</td><td>não</td><td></td><td><code>PAPERBACK</code>, <code>HARDCOVER</code> ou <code>POCKET</code></td></tr><tr><td><code>price</code></td><td>decimal(12,2)</td><td>não</td><td></td><td>Preço de venda</td></tr><tr><td><code>list_price</code></td><td>decimal(12,2)</td><td>não</td><td></td><td>Preço de capa (maior ou igual ao de venda)</td></tr><tr><td><code>stock_quantity</code></td><td>int</td><td>não</td><td></td><td>Estoque disponível; nunca fica negativo</td></tr><tr><td><code>weight_grams</code></td><td>int</td><td>não</td><td></td><td>Peso usado no frete</td></tr><tr><td><code>cover_style</code></td><td>int</td><td>não</td><td></td><td>Estilo da capa gerada (0 a 11)</td></tr><tr><td><code>rating_average</code></td><td>decimal(3,2)</td><td>não</td><td></td><td>Nota média (0 a 5)</td></tr><tr><td><code>rating_count</code></td><td>int</td><td>não</td><td></td><td>Quantidade de avaliações</td></tr><tr><td><code>sold_count</code></td><td>int</td><td>não</td><td></td><td>Unidades vendidas (ordena os mais vendidos)</td></tr><tr><td><code>active</code></td><td>0/1</td><td>não</td><td></td><td>1 = ativo, 0 = desativado (exclusão lógica)</td></tr><tr><td><code>search_text</code></td><td>varchar(1000)</td><td>não</td><td></td><td>Título, subtítulo, autores, editora e ISBN sem acentos e em minúsculas (alvo da busca)</td></tr><tr><td><code>created_at</code></td><td>timestamp utc</td><td>não</td><td></td><td>Quando foi criado (UTC)</td></tr><tr><td><code>updated_at</code></td><td>timestamp utc</td><td>não</td><td></td><td>Última alteração (UTC)</td></tr></tbody></table><p class="tnote">Índices (category_id), (publisher_id), (active, sold_count), (created_at) e (price). <code>category_id</code> referencia <code>category(id)</code>; <code>publisher_id</code> referencia <code>publisher(id)</code>.</p></div><div class="tbl" id="t-book_author"><h3>book_author</h3><p>Liga livros e autores, guardando a ordem de cada autor no livro.</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>book_id</code></td><td>bigint</td><td>não</td><td>PK, FK</td><td>Livro</td></tr><tr><td><code>author_id</code></td><td>bigint</td><td>não</td><td>FK</td><td>Autor</td></tr><tr><td><code>author_order</code></td><td>int</td><td>não</td><td>PK</td><td>Posição do autor no livro (0, 1, 2...)</td></tr></tbody></table><p class="tnote">Chave primária composta (book_id, author_order). Índice (author_id). <code>book_id</code> referencia <code>book(id)</code> com exclusão em cascata; <code>author_id</code> referencia <code>author(id)</code>.</p></div><div class="tbl" id="t-curated_catalog"><h3>curated_catalog</h3><p>Catálogos curados: vitrines com nome, chamada e ordem na vitrine.</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code></td><td>bigint</td><td>não</td><td>PK</td><td>Identificador gerado pelo banco (identidade)</td></tr><tr><td><code>name</code></td><td>varchar(80)</td><td>não</td><td></td><td>Nome exibido</td></tr><tr><td><code>slug</code></td><td>varchar(90)</td><td>não</td><td>UK</td><td>Identificador legível usado nas URLs</td></tr><tr><td><code>description</code></td><td>varchar(400)</td><td>sim</td><td></td><td>Texto de apoio</td></tr><tr><td><code>highlight</code></td><td>varchar(160)</td><td>sim</td><td></td><td>Chamada curta da vitrine</td></tr><tr><td><code>sort_order</code></td><td>int</td><td>não</td><td></td><td>Ordem de exibição</td></tr><tr><td><code>active</code></td><td>0/1</td><td>não</td><td></td><td>1 = ativo, 0 = desativado (exclusão lógica)</td></tr></tbody></table></div><div class="tbl" id="t-curated_catalog_book"><h3>curated_catalog_book</h3><p>Livros de cada catálogo, na ordem escolhida pela livraria.</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>catalog_id</code></td><td>bigint</td><td>não</td><td>PK, FK</td><td>Catálogo</td></tr><tr><td><code>book_id</code></td><td>bigint</td><td>não</td><td>FK</td><td>Livro</td></tr><tr><td><code>item_position</code></td><td>int</td><td>não</td><td>PK</td><td>Posição do livro no catálogo</td></tr></tbody></table><p class="tnote">Chave primária composta (catalog_id, item_position). Índice (book_id). <code>catalog_id</code> referencia <code>curated_catalog(id)</code> com exclusão em cascata; <code>book_id</code> referencia <code>book(id)</code>.</p></div><div class="tbl" id="t-cart"><h3>cart</h3><p>Um carrinho por conta.</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code></td><td>bigint</td><td>não</td><td>PK</td><td>Identificador gerado pelo banco (identidade)</td></tr><tr><td><code>user_id</code></td><td>bigint</td><td>não</td><td>FK, UK</td><td>Conta dona do registro</td></tr><tr><td><code>updated_at</code></td><td>timestamp utc</td><td>não</td><td></td><td>Última mudança no carrinho</td></tr></tbody></table><p class="tnote"><code>user_id</code> referencia <code>app_user(id)</code>.</p></div><div class="tbl" id="t-cart_item"><h3>cart_item</h3><p>Itens do carrinho (um por livro).</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code></td><td>bigint</td><td>não</td><td>PK</td><td>Identificador gerado pelo banco (identidade)</td></tr><tr><td><code>cart_id</code></td><td>bigint</td><td>não</td><td>FK</td><td>Carrinho</td></tr><tr><td><code>book_id</code></td><td>bigint</td><td>não</td><td>FK</td><td>Livro</td></tr><tr><td><code>quantity</code></td><td>int</td><td>não</td><td></td><td>Quantidade (1 a 10)</td></tr><tr><td><code>added_at</code></td><td>timestamp utc</td><td>não</td><td></td><td>Quando entrou no carrinho</td></tr></tbody></table><p class="tnote">Única (cart_id, book_id). Índice (book_id). <code>cart_id</code> referencia <code>cart(id)</code> com exclusão em cascata; <code>book_id</code> referencia <code>book(id)</code>.</p></div><div class="tbl" id="t-shipping_method"><h3>shipping_method</h3><p>Formas de envio e a tabela de frete (taxa base, valor por quilo, frete grátis e prazos).</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code></td><td>bigint</td><td>não</td><td>PK</td><td>Identificador gerado pelo banco (identidade)</td></tr><tr><td><code>code</code></td><td>varchar(20)</td><td>não</td><td>UK</td><td><code>ECONOMICA</code>, <code>EXPRESSA</code> ou <code>RETIRADA</code></td></tr><tr><td><code>name</code></td><td>varchar(60)</td><td>não</td><td></td><td>Nome exibido</td></tr><tr><td><code>carrier</code></td><td>varchar(60)</td><td>não</td><td></td><td>Transportadora</td></tr><tr><td><code>description</code></td><td>varchar(200)</td><td>sim</td><td></td><td>Texto mostrado no checkout</td></tr><tr><td><code>base_fee</code></td><td>decimal(12,2)</td><td>não</td><td></td><td>Taxa fixa do frete</td></tr><tr><td><code>fee_per_kg</code></td><td>decimal(12,2)</td><td>não</td><td></td><td>Valor por quilo (arredondado para cima)</td></tr><tr><td><code>free_above</code></td><td>decimal(12,2)</td><td>sim</td><td></td><td>Subtotal a partir do qual o frete é grátis</td></tr><tr><td><code>min_days</code></td><td>int</td><td>não</td><td></td><td>Prazo mínimo em dias úteis</td></tr><tr><td><code>max_days</code></td><td>int</td><td>não</td><td></td><td>Prazo máximo em dias úteis</td></tr><tr><td><code>sort_order</code></td><td>int</td><td>não</td><td></td><td>Ordem de exibição</td></tr><tr><td><code>active</code></td><td>0/1</td><td>não</td><td></td><td>1 = ativo, 0 = desativado (exclusão lógica)</td></tr></tbody></table></div><div class="tbl" id="t-coupon"><h3>coupon</h3><p>Cupons de desconto (percentual ou valor fixo).</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code></td><td>bigint</td><td>não</td><td>PK</td><td>Identificador gerado pelo banco (identidade)</td></tr><tr><td><code>code</code></td><td>varchar(30)</td><td>não</td><td>UK</td><td>Código digitado pela pessoa (BEMVINDO10...)</td></tr><tr><td><code>description</code></td><td>varchar(160)</td><td>não</td><td></td><td>Mensagem mostrada quando o cupom vale</td></tr><tr><td><code>discount_type</code></td><td>varchar(10)</td><td>não</td><td></td><td><code>PERCENT</code> ou <code>FIXED</code></td></tr><tr><td><code>discount_value</code></td><td>decimal(12,2)</td><td>não</td><td></td><td>Percentual ou valor do desconto</td></tr><tr><td><code>min_subtotal</code></td><td>decimal(12,2)</td><td>não</td><td></td><td>Subtotal mínimo para valer</td></tr><tr><td><code>valid_until</code></td><td>timestamp utc</td><td>sim</td><td></td><td>Validade (opcional)</td></tr><tr><td><code>active</code></td><td>0/1</td><td>não</td><td></td><td>1 = ativo, 0 = desativado (exclusão lógica)</td></tr></tbody></table></div><div class="tbl" id="t-purchase_order"><h3>purchase_order</h3><p>Pedidos, com cópia do endereço, do frete e dos totais no momento da compra.</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code></td><td>bigint</td><td>não</td><td>PK</td><td>Identificador gerado pelo banco (identidade)</td></tr><tr><td><code>code</code></td><td>varchar(20)</td><td>não</td><td>UK</td><td>Código do pedido (PED-AAMMDD-XXXXX)</td></tr><tr><td><code>user_id</code></td><td>bigint</td><td>não</td><td>FK</td><td>Conta dona do registro</td></tr><tr><td><code>order_status</code></td><td>varchar(20)</td><td>não</td><td></td><td><code>PENDING_PAYMENT</code>, <code>PAID</code>, <code>SHIPPED</code>, <code>DELIVERED</code> ou <code>CANCELED</code></td></tr><tr><td><code>subtotal</code></td><td>decimal(12,2)</td><td>não</td><td></td><td>Soma dos itens</td></tr><tr><td><code>discount</code></td><td>decimal(12,2)</td><td>não</td><td></td><td>Desconto do cupom</td></tr><tr><td><code>shipping_fee</code></td><td>decimal(12,2)</td><td>não</td><td></td><td>Frete cobrado</td></tr><tr><td><code>total</code></td><td>decimal(12,2)</td><td>não</td><td></td><td>Subtotal menos desconto mais frete</td></tr><tr><td><code>coupon_code</code></td><td>varchar(30)</td><td>sim</td><td></td><td>Cupom aplicado</td></tr><tr><td><code>item_count</code></td><td>int</td><td>não</td><td></td><td>Unidades no pedido</td></tr><tr><td><code>ship_recipient</code></td><td>varchar(120)</td><td>não</td><td></td><td>Cópia: quem recebe</td></tr><tr><td><code>ship_zip_code</code></td><td>varchar(9)</td><td>não</td><td></td><td>Cópia: CEP</td></tr><tr><td><code>ship_street</code></td><td>varchar(160)</td><td>não</td><td></td><td>Cópia: rua</td></tr><tr><td><code>ship_number</code></td><td>varchar(20)</td><td>não</td><td></td><td>Cópia: número</td></tr><tr><td><code>ship_complement</code></td><td>varchar(80)</td><td>sim</td><td></td><td>Cópia: complemento</td></tr><tr><td><code>ship_district</code></td><td>varchar(80)</td><td>não</td><td></td><td>Cópia: bairro</td></tr><tr><td><code>ship_city</code></td><td>varchar(80)</td><td>não</td><td></td><td>Cópia: cidade</td></tr><tr><td><code>ship_state</code></td><td>varchar(2)</td><td>não</td><td></td><td>Cópia: UF</td></tr><tr><td><code>shipping_method_code</code></td><td>varchar(20)</td><td>não</td><td></td><td>Cópia: código da forma de envio</td></tr><tr><td><code>shipping_method_name</code></td><td>varchar(60)</td><td>não</td><td></td><td>Cópia: nome da forma de envio</td></tr><tr><td><code>shipping_carrier</code></td><td>varchar(60)</td><td>não</td><td></td><td>Cópia: transportadora</td></tr><tr><td><code>shipping_min_days</code></td><td>int</td><td>não</td><td></td><td>Cópia: prazo mínimo</td></tr><tr><td><code>shipping_max_days</code></td><td>int</td><td>não</td><td></td><td>Cópia: prazo máximo</td></tr><tr><td><code>placed_at</code></td><td>timestamp utc</td><td>não</td><td></td><td>Quando o pedido foi feito</td></tr><tr><td><code>payment_due_at</code></td><td>timestamp utc</td><td>não</td><td></td><td>Prazo para pagar; depois disso o pedido é cancelado</td></tr><tr><td><code>paid_at</code></td><td>timestamp utc</td><td>sim</td><td></td><td>Quando o pagamento foi aprovado</td></tr><tr><td><code>canceled_at</code></td><td>timestamp utc</td><td>sim</td><td></td><td>Quando foi cancelado</td></tr><tr><td><code>cancel_reason</code></td><td>varchar(200)</td><td>sim</td><td></td><td>Motivo do cancelamento</td></tr><tr><td><code>version</code></td><td>bigint</td><td>não</td><td></td><td>Versão para bloqueio otimista (JPA <code>@Version</code>)</td></tr></tbody></table><p class="tnote">Índices (user_id, placed_at), (order_status, payment_due_at), (placed_at) e (paid_at). <code>user_id</code> referencia <code>app_user(id)</code>.</p></div><div class="tbl" id="t-order_item"><h3>order_item</h3><p>Itens do pedido, com cópia do título, do ISBN e do preço pago.</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code></td><td>bigint</td><td>não</td><td>PK</td><td>Identificador gerado pelo banco (identidade)</td></tr><tr><td><code>order_id</code></td><td>bigint</td><td>não</td><td>FK</td><td>Pedido</td></tr><tr><td><code>book_id</code></td><td>bigint</td><td>não</td><td>FK</td><td>Livro</td></tr><tr><td><code>book_slug</code></td><td>varchar(220)</td><td>não</td><td></td><td>Cópia: slug do livro</td></tr><tr><td><code>book_title</code></td><td>varchar(200)</td><td>não</td><td></td><td>Cópia: título</td></tr><tr><td><code>book_authors</code></td><td>varchar(300)</td><td>sim</td><td></td><td>Cópia: autores</td></tr><tr><td><code>book_isbn</code></td><td>varchar(17)</td><td>não</td><td></td><td>Cópia: ISBN</td></tr><tr><td><code>cover_style</code></td><td>int</td><td>não</td><td></td><td>Estilo da capa gerada (0 a 11)</td></tr><tr><td><code>unit_price</code></td><td>decimal(12,2)</td><td>não</td><td></td><td>Preço pago por unidade</td></tr><tr><td><code>quantity</code></td><td>int</td><td>não</td><td></td><td>Quantidade (1 a 10)</td></tr><tr><td><code>line_total</code></td><td>decimal(12,2)</td><td>não</td><td></td><td>Preço vezes quantidade</td></tr></tbody></table><p class="tnote">Índices (order_id) e (book_id). <code>order_id</code> referencia <code>purchase_order(id)</code> com exclusão em cascata; <code>book_id</code> referencia <code>book(id)</code>.</p></div><div class="tbl" id="t-payment"><h3>payment</h3><p>Tentativas de pagamento de cada pedido. Não guarda número de cartão nem CVV.</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code></td><td>bigint</td><td>não</td><td>PK</td><td>Identificador gerado pelo banco (identidade)</td></tr><tr><td><code>order_id</code></td><td>bigint</td><td>não</td><td>FK</td><td>Pedido</td></tr><tr><td><code>payment_method</code></td><td>varchar(20)</td><td>não</td><td></td><td><code>CREDIT_CARD</code>, <code>PIX</code> ou <code>BOLETO</code></td></tr><tr><td><code>payment_status</code></td><td>varchar(20)</td><td>não</td><td></td><td><code>PENDING</code>, <code>APPROVED</code>, <code>DECLINED</code>, <code>EXPIRED</code>, <code>REFUNDED</code> ou <code>CANCELED</code></td></tr><tr><td><code>amount</code></td><td>decimal(12,2)</td><td>não</td><td></td><td>Valor cobrado</td></tr><tr><td><code>installments</code></td><td>int</td><td>não</td><td></td><td>Parcelas (1 para Pix e boleto)</td></tr><tr><td><code>card_brand</code></td><td>varchar(20)</td><td>sim</td><td></td><td>Bandeira do cartão</td></tr><tr><td><code>card_last4</code></td><td>varchar(4)</td><td>sim</td><td></td><td>Quatro últimos dígitos</td></tr><tr><td><code>pix_payload</code></td><td>varchar(400)</td><td>sim</td><td></td><td>Código Pix copia e cola</td></tr><tr><td><code>boleto_line</code></td><td>varchar(60)</td><td>sim</td><td></td><td>Linha digitável do boleto</td></tr><tr><td><code>gateway_reference</code></td><td>varchar(40)</td><td>não</td><td>UK</td><td>Referência única no provedor</td></tr><tr><td><code>idempotency_key</code></td><td>varchar(80)</td><td>não</td><td>UK</td><td>Chave de idempotência (conta + chave enviada)</td></tr><tr><td><code>failure_reason</code></td><td>varchar(200)</td><td>sim</td><td></td><td>Motivo da recusa</td></tr><tr><td><code>expires_at</code></td><td>timestamp utc</td><td>sim</td><td></td><td>Validade do Pix ou do boleto</td></tr><tr><td><code>created_at</code></td><td>timestamp utc</td><td>não</td><td></td><td>Quando foi criado (UTC)</td></tr><tr><td><code>confirmed_at</code></td><td>timestamp utc</td><td>sim</td><td></td><td>Quando o provedor confirmou</td></tr></tbody></table><p class="tnote">Índice (order_id, payment_status). <code>order_id</code> referencia <code>purchase_order(id)</code>.</p></div><div class="tbl" id="t-shipment"><h3>shipment</h3><p>O envio de um pedido pago (um por pedido).</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code></td><td>bigint</td><td>não</td><td>PK</td><td>Identificador gerado pelo banco (identidade)</td></tr><tr><td><code>order_id</code></td><td>bigint</td><td>não</td><td>FK, UK</td><td>Pedido</td></tr><tr><td><code>carrier</code></td><td>varchar(60)</td><td>não</td><td></td><td>Cópia: transportadora</td></tr><tr><td><code>service_name</code></td><td>varchar(60)</td><td>não</td><td></td><td>Forma de envio</td></tr><tr><td><code>tracking_code</code></td><td>varchar(30)</td><td>sim</td><td></td><td>Código de rastreio</td></tr><tr><td><code>shipment_status</code></td><td>varchar(20)</td><td>não</td><td></td><td><code>PREPARING</code>, <code>IN_TRANSIT</code>, <code>OUT_FOR_DELIVERY</code>, <code>DELIVERED</code> ou <code>RETURNED</code></td></tr><tr><td><code>estimated_delivery</code></td><td>date</td><td>sim</td><td></td><td>Previsão de entrega (data)</td></tr><tr><td><code>shipped_at</code></td><td>timestamp utc</td><td>sim</td><td></td><td>Quando foi postado</td></tr><tr><td><code>delivered_at</code></td><td>timestamp utc</td><td>sim</td><td></td><td>Quando foi entregue</td></tr><tr><td><code>created_at</code></td><td>timestamp utc</td><td>não</td><td></td><td>Quando foi criado (UTC)</td></tr><tr><td><code>updated_at</code></td><td>timestamp utc</td><td>não</td><td></td><td>Última alteração (UTC)</td></tr></tbody></table><p class="tnote">Índices (shipment_status) e (tracking_code). <code>order_id</code> referencia <code>purchase_order(id)</code>.</p></div><div class="tbl" id="t-shipment_event"><h3>shipment_event</h3><p>Linha do tempo do rastreio: cada etapa vira um evento.</p><table class="fields"><thead><tr><th>Campo</th><th>Tipo</th><th>Nulo</th><th>Chave</th><th>Descrição</th></tr></thead><tbody><tr><td><code>id</code></td><td>bigint</td><td>não</td><td>PK</td><td>Identificador gerado pelo banco (identidade)</td></tr><tr><td><code>shipment_id</code></td><td>bigint</td><td>não</td><td>FK</td><td>Envio</td></tr><tr><td><code>shipment_status</code></td><td>varchar(20)</td><td>não</td><td></td><td><code>PREPARING</code>, <code>IN_TRANSIT</code>, <code>OUT_FOR_DELIVERY</code>, <code>DELIVERED</code> ou <code>RETURNED</code></td></tr><tr><td><code>title</code></td><td>varchar(120)</td><td>não</td><td></td><td>Título do evento (Pedido enviado, Saiu para entrega...)</td></tr><tr><td><code>detail</code></td><td>varchar(300)</td><td>sim</td><td></td><td>Descrição do evento</td></tr><tr><td><code>location</code></td><td>varchar(120)</td><td>sim</td><td></td><td>Local do evento</td></tr><tr><td><code>occurred_at</code></td><td>timestamp utc</td><td>não</td><td></td><td>Quando aconteceu</td></tr></tbody></table><p class="tnote">Índice (shipment_id, occurred_at). <code>shipment_id</code> referencia <code>shipment(id)</code> com exclusão em cascata.</p></div>
+</section>
+
+<!-- ===================== 6 ===================== -->
+<section class="chapter" id="ch-quatro">
+  <div class="chapter-head"><div class="num">Capítulo 6</div><h2>Uma tabela nos quatro bancos</h2>
+    <p class="lede">Para comparar, a mesma tabela <code>app_user</code> como ela é criada em cada banco. As outras seguem o mesmo padrão.</p></div>
+  <h3>PostgreSQL</h3>
+<pre><code>CREATE TABLE app_user (
+    id BIGINT GENERATED BY DEFAULT AS IDENTITY NOT NULL,
+    email VARCHAR(160) NOT NULL,
+    password_hash VARCHAR(100) NOT NULL,
+    full_name VARCHAR(120) NOT NULL,
+    phone VARCHAR(20),
+    user_role VARCHAR(20) NOT NULL,
+    active SMALLINT NOT NULL,
+    created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    last_login_at TIMESTAMP(6) WITH TIME ZONE,
+    CONSTRAINT pk_app_user PRIMARY KEY (id),
+    CONSTRAINT uk_app_user_email UNIQUE (email)
+);</code></pre>
+  <h3>MySQL</h3>
+<pre><code>CREATE TABLE app_user (
+    id BIGINT AUTO_INCREMENT NOT NULL,
+    email VARCHAR(160) NOT NULL,
+    password_hash VARCHAR(100) NOT NULL,
+    full_name VARCHAR(120) NOT NULL,
+    phone VARCHAR(20),
+    user_role VARCHAR(20) NOT NULL,
+    active SMALLINT NOT NULL,
+    created_at DATETIME(6) NOT NULL,
+    last_login_at DATETIME(6),
+    CONSTRAINT pk_app_user PRIMARY KEY (id),
+    CONSTRAINT uk_app_user_email UNIQUE (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;</code></pre>
+  <h3>SQL Server</h3>
+<pre><code>CREATE TABLE app_user (
+    id BIGINT IDENTITY(1,1) NOT NULL,
+    email NVARCHAR(160) NOT NULL,
+    password_hash NVARCHAR(100) NOT NULL,
+    full_name NVARCHAR(120) NOT NULL,
+    phone NVARCHAR(20),
+    user_role NVARCHAR(20) NOT NULL,
+    active SMALLINT NOT NULL,
+    created_at DATETIMEOFFSET(6) NOT NULL,
+    last_login_at DATETIMEOFFSET(6),
+    CONSTRAINT pk_app_user PRIMARY KEY (id),
+    CONSTRAINT uk_app_user_email UNIQUE (email)
+);</code></pre>
+  <h3>Oracle</h3>
+<pre><code>CREATE TABLE app_user (
+    id NUMBER(19) GENERATED BY DEFAULT ON NULL AS IDENTITY,
+    email VARCHAR2(160 CHAR) NOT NULL,
+    password_hash VARCHAR2(100 CHAR) NOT NULL,
+    full_name VARCHAR2(120 CHAR) NOT NULL,
+    phone VARCHAR2(20 CHAR),
+    user_role VARCHAR2(20 CHAR) NOT NULL,
+    active NUMBER(1) NOT NULL,
+    created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+    last_login_at TIMESTAMP(6) WITH TIME ZONE,
+    CONSTRAINT pk_app_user PRIMARY KEY (id),
+    CONSTRAINT uk_app_user_email UNIQUE (email)
+);</code></pre>
+</section>
+
+<!-- ===================== 7 ===================== -->
+<section class="chapter" id="ch-estados">
+  <div class="chapter-head"><div class="num">Capítulo 7</div><h2>Máquinas de estado</h2>
+    <p class="lede">Os status são texto (VARCHAR) com os nomes dos enums Java. Só as transições abaixo acontecem; qualquer outra é recusada pela API. Nos esquemas, o ponto é o registro novo, o bloco escuro é o fim normal e o tracejado é um fim sem sucesso.</p></div>
+
+  <h3 id="s-sm-pedido">Pedido</h3>
+  <div class="sm">
+    <div class="line"><span class="st start"></span><span class="ar">checkout</span><span class="st">PENDING_PAYMENT</span><span class="ar">pago</span><span class="st">PAID</span><span class="ar">postado</span><span class="st">SHIPPED</span><span class="ar">entregue</span><span class="st end">DELIVERED</span></div>
+    <div class="line"><span class="from">De PENDING_PAYMENT</span><span class="ar">prazo ou cancelamento</span><span class="st fail">CANCELED</span></div>
+    <div class="line"><span class="from">De PAID</span><span class="ar">estorno</span><span class="st fail">CANCELED</span></div>
+  </div>
+  <table>
+    <thead><tr><th>De</th><th>Para</th><th>Quando</th></tr></thead>
+    <tbody>
+      <tr><td>(novo)</td><td><code>PENDING_PAYMENT</code></td><td>Checkout: estoque reservado, prazo de 60 min</td></tr>
+      <tr><td><code>PENDING_PAYMENT</code></td><td><code>PAID</code></td><td>Cartão aprovado ou Pix e boleto confirmados; cria o envio</td></tr>
+      <tr><td><code>PENDING_PAYMENT</code></td><td><code>CANCELED</code></td><td>Cancelado pela pessoa, pela livraria ou pelo fim do prazo; o estoque volta</td></tr>
+      <tr><td><code>PAID</code></td><td><code>SHIPPED</code></td><td>A livraria posta o pedido (envio em trânsito)</td></tr>
+      <tr><td><code>PAID</code></td><td><code>CANCELED</code></td><td>Cancelado antes de postar; pagamento estornado</td></tr>
+      <tr><td><code>SHIPPED</code></td><td><code>DELIVERED</code></td><td>Entrega confirmada</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="s-sm-pagamento">Pagamento</h3>
+  <div class="sm">
+    <div class="line"><span class="st start"></span><span class="ar">cartão</span><span class="st end">APPROVED</span><span class="ar">pedido cancelado</span><span class="st fail">REFUNDED</span></div>
+    <div class="line"><span class="st start"></span><span class="ar">cartão</span><span class="st fail">DECLINED</span></div>
+    <div class="line"><span class="st start"></span><span class="ar">Pix ou boleto</span><span class="st">PENDING</span><span class="ar">confirmado</span><span class="st end">APPROVED</span></div>
+    <div class="line"><span class="from">De PENDING</span><span class="ar">validade</span><span class="st fail">EXPIRED</span><span class="ar">outro aprovado</span><span class="st fail">CANCELED</span></div>
+  </div>
+  <table>
+    <thead><tr><th>De</th><th>Para</th><th>Quando</th></tr></thead>
+    <tbody>
+      <tr><td>(novo)</td><td><code>APPROVED</code> ou <code>DECLINED</code></td><td>Cartão: a resposta do provedor é imediata</td></tr>
+      <tr><td>(novo)</td><td><code>PENDING</code></td><td>Pix ou boleto gerado</td></tr>
+      <tr><td><code>PENDING</code></td><td><code>APPROVED</code></td><td>O banco confirma (no sandbox, o botão Simular)</td></tr>
+      <tr><td><code>PENDING</code></td><td><code>EXPIRED</code></td><td>Passou a validade ou o prazo do pedido</td></tr>
+      <tr><td><code>PENDING</code></td><td><code>CANCELED</code></td><td>Outro pagamento do pedido foi aprovado ou o pedido foi cancelado</td></tr>
+      <tr><td><code>APPROVED</code></td><td><code>REFUNDED</code></td><td>Pedido pago cancelado antes do envio</td></tr>
+    </tbody>
+  </table>
+
+  <h3 id="s-sm-envio">Envio</h3>
+  <div class="sm">
+    <div class="line"><span class="st start"></span><span class="st">PREPARING</span><span class="ar">rastreio</span><span class="st">IN_TRANSIT</span><span class="ar"></span><span class="st">OUT_FOR_DELIVERY</span><span class="ar"></span><span class="st end">DELIVERED</span></div>
+    <div class="line"><span class="from">De PREPARING</span><span class="ar">pedido cancelado</span><span class="st fail">RETURNED</span></div>
+  </div>
+  <table>
+    <thead><tr><th>De</th><th>Para</th><th>Evento na linha do tempo</th></tr></thead>
+    <tbody>
+      <tr><td>(novo)</td><td><code>PREPARING</code></td><td>Pagamento confirmado; Pedido em separação</td></tr>
+      <tr><td><code>PREPARING</code></td><td><code>IN_TRANSIT</code></td><td>Pedido enviado (com código de rastreio)</td></tr>
+      <tr><td><code>IN_TRANSIT</code></td><td><code>OUT_FOR_DELIVERY</code></td><td>Saiu para entrega</td></tr>
+      <tr><td><code>OUT_FOR_DELIVERY</code></td><td><code>DELIVERED</code></td><td>Pedido entregue</td></tr>
+      <tr><td><code>PREPARING</code></td><td><code>RETURNED</code></td><td>Pedido cancelado</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ===================== 8 ===================== -->
+<section class="chapter" id="ch-compra">
+  <div class="chapter-head"><div class="num">Capítulo 8</div><h2>Uma compra passo a passo</h2>
+    <p class="lede">O que cada etapa grava, para quem precisa auditar ou investigar um pedido.</p></div>
+  <table>
+    <thead><tr><th></th><th>Etapa</th><th>Tabelas</th><th>O que acontece</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Carrinho</td><td><code>cart</code>, <code>cart_item</code></td><td>Cria o carrinho na primeira vez; um item por livro</td></tr>
+      <tr><td>2</td><td>Checkout</td><td><code>book</code>, <code>purchase_order</code>, <code>order_item</code>, <code>cart_item</code></td><td>Baixa o estoque e soma vendidos, cria o pedido com as cópias, esvazia o carrinho</td></tr>
+      <tr><td>3</td><td>Token do cartão</td><td>Redis</td><td>Nada vai para o banco</td></tr>
+      <tr><td>4</td><td>Pagamento</td><td><code>payment</code></td><td>Uma linha por tentativa, com chave de idempotência</td></tr>
+      <tr><td>5</td><td>Aprovação</td><td><code>payment</code>, <code>purchase_order</code>, <code>shipment</code>, <code>shipment_event</code></td><td>Pedido pago, outros pendentes cancelados, envio e dois eventos criados</td></tr>
+      <tr><td>6</td><td>Postagem e entrega</td><td><code>shipment</code>, <code>shipment_event</code>, <code>purchase_order</code></td><td>Rastreio, eventos e status do pedido</td></tr>
+      <tr><td></td><td>Cancelamento</td><td><code>purchase_order</code>, <code>payment</code>, <code>book</code>, <code>shipment_event</code></td><td>Status, estorno, devolução do estoque e evento</td></tr>
+    </tbody>
+  </table>
+  <p>O cancelamento pode acontecer em qualquer ponto antes da postagem.</p>
+  <div class="note tip"><b class="t">Comprar de novo</b>Na interface, o botão Comprar de novo de um pedido entregue ou cancelado só coloca os mesmos livros no carrinho (etapa 1). O pedido antigo não muda.</div>
+</section>
+
+<!-- ===================== 9 ===================== -->
+<section class="chapter" id="ch-consultas">
+  <div class="chapter-head"><div class="num">Capítulo 9</div><h2>Consultas úteis</h2>
+    <p class="lede">SQL que roda igual nos quatro bancos, exceto onde indicado.</p></div>
+  <h3>Pedidos por status</h3>
+<pre><code>SELECT order_status, COUNT(*) AS pedidos, SUM(total) AS valor
+FROM purchase_order
+GROUP BY order_status
+ORDER BY pedidos DESC;</code></pre>
+  <h3>Livros mais vendidos</h3>
+<pre><code>SELECT b.title, SUM(i.quantity) AS unidades, SUM(i.line_total) AS receita
+FROM order_item i
+JOIN purchase_order o ON o.id = i.order_id
+JOIN book b ON b.id = i.book_id
+WHERE o.order_status &lt;&gt; 'CANCELED'
+GROUP BY b.title
+ORDER BY unidades DESC;</code></pre>
+  <p>Para limitar a 10 linhas: <code>LIMIT 10</code> no PostgreSQL e no MySQL; <code>FETCH FIRST 10 ROWS ONLY</code> no Oracle e no PostgreSQL; <code>SELECT TOP 10</code> ou <code>OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY</code> no SQL Server.</p>
+  <h3>Receita por forma de pagamento</h3>
+<pre><code>SELECT p.payment_method, COUNT(*) AS pagamentos, SUM(p.amount) AS valor
+FROM payment p
+WHERE p.payment_status = 'APPROVED'
+GROUP BY p.payment_method;</code></pre>
+  <h3>Estoque baixo</h3>
+<pre><code>SELECT title, stock_quantity, sold_count
+FROM book
+WHERE active = 1 AND stock_quantity &lt;= 5
+ORDER BY stock_quantity, title;</code></pre>
+  <p>É o mesmo critério do filtro Estoque baixo (até 5) da tela Livros e estoque na administração.</p>
+  <h3>Pedidos que vão expirar</h3>
+<pre><code>SELECT code, total, payment_due_at
+FROM purchase_order
+WHERE order_status = 'PENDING_PAYMENT'
+ORDER BY payment_due_at;</code></pre>
+  <h3>Rastreio de um pedido</h3>
+<pre><code>SELECT e.occurred_at, e.shipment_status, e.title, e.location
+FROM shipment_event e
+JOIN shipment s ON s.id = e.shipment_id
+JOIN purchase_order o ON o.id = s.order_id
+WHERE o.code = 'PED-DEMO2-TRANS'
+ORDER BY e.occurred_at;</code></pre>
+</section>
+
+<!-- ===================== 10 ===================== -->
+<section class="chapter" id="ch-preparar">
+  <div class="chapter-head"><div class="num">Capítulo 10</div><h2>Como preparar o banco</h2>
+    <p class="lede">Com Docker não há nada a fazer: o Compose cria banco e usuário. Para um servidor que já existe, crie um banco vazio e um usuário dono dele; o Flyway cria as tabelas na primeira subida.</p></div>
+  <h3>PostgreSQL</h3>
+<pre><code>CREATE USER prelo WITH PASSWORD 'troque-esta-senha';
+CREATE DATABASE prelo OWNER prelo ENCODING 'UTF8';</code></pre>
+<pre><code>DB_VENDOR=postgresql DB_HOST=servidor DB_PORT=5432 DB_NAME=prelo DB_USER=prelo DB_PASSWORD=...</code></pre>
+  <h3>MySQL</h3>
+<pre><code>CREATE DATABASE prelo CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+CREATE USER 'prelo'@'%' IDENTIFIED BY 'troque-esta-senha';
+GRANT ALL PRIVILEGES ON prelo.* TO 'prelo'@'%';</code></pre>
+  <p>A URL padrão já usa UTC na sessão e aceita a chave pública do servidor (necessária para <code>caching_sha2_password</code> sem certificado do cliente).</p>
+  <h3>SQL Server</h3>
+<pre><code>CREATE DATABASE prelo;
+CREATE LOGIN prelo WITH PASSWORD = 'Troque-Esta-Senha-1';
+USE prelo;
+CREATE USER prelo FOR LOGIN prelo;
+ALTER ROLE db_owner ADD MEMBER prelo;</code></pre>
+  <p>A conexão usa <code>encrypt=true</code>. Com certificado válido no servidor, defina <code>DB_TRUST_CERT=false</code>.</p>
+  <h3>Oracle</h3>
+<pre><code>-- conectado como administrador no PDB (por exemplo FREEPDB1)
+CREATE USER prelo IDENTIFIED BY "troque-esta-senha" QUOTA UNLIMITED ON USERS;
+GRANT CREATE SESSION, CREATE TABLE, CREATE SEQUENCE, CREATE VIEW TO prelo;</code></pre>
+<pre><code>DB_VENDOR=oracle DB_HOST=servidor DB_PORT=1521 ORACLE_SERVICE=FREEPDB1 DB_USER=prelo DB_PASSWORD=...</code></pre>
+  <h3>Dar acesso de administração</h3>
+<pre><code>UPDATE app_user SET user_role = 'ADMIN' WHERE email = 'voce@sualivraria.com.br';</code></pre>
+  <p>A pessoa precisa sair e entrar de novo para o novo papel valer no token.</p>
+</section>
+
+<!-- ===================== 11 ===================== -->
+<section class="chapter" id="ch-backup">
+  <div class="chapter-head"><div class="num">Capítulo 11</div><h2>Backup, restauração e problemas comuns</h2>
+    <p class="lede">Os comandos de cópia de segurança de cada banco e as mensagens de erro que mais aparecem.</p></div>
+  <h3>Backup e restauração com Docker</h3>
+  <table class="wide">
+    <thead><tr><th>Banco</th><th>Backup</th><th>Restauração</th></tr></thead>
+    <tbody>
+      <tr><td>PostgreSQL</td><td><code>docker compose exec postgresql pg_dump -U prelo -Fc prelo &gt; prelo.dump</code></td><td><code>pg_restore -U prelo -d prelo --clean prelo.dump</code></td></tr>
+      <tr><td>MySQL</td><td><code>docker compose exec mysql mysqldump -uprelo -p --single-transaction prelo &gt; prelo.sql</code></td><td><code>mysql -uprelo -p prelo &lt; prelo.sql</code></td></tr>
+      <tr><td>SQL Server</td><td><code>BACKUP DATABASE prelo TO DISK = '/var/opt/mssql/prelo.bak'</code></td><td><code>RESTORE DATABASE prelo FROM DISK = '/var/opt/mssql/prelo.bak' WITH REPLACE</code></td></tr>
+      <tr><td>Oracle</td><td><code>expdp prelo/... schemas=prelo directory=DATA_PUMP_DIR dumpfile=prelo.dmp</code></td><td><code>impdp prelo/... schemas=prelo directory=DATA_PUMP_DIR dumpfile=prelo.dmp</code></td></tr>
+    </tbody>
+  </table>
+  <p>Os volumes do Docker (<code>pg-data</code>, <code>mysql-data</code>, <code>mssql-data</code>, <code>oracle-data</code>) guardam os dados entre reinícios. <code>docker compose down -v</code> apaga todos.</p>
+  <h3>Problemas comuns</h3>
+  <table>
+    <thead><tr><th>Mensagem ou sintoma</th><th>Causa</th><th>O que fazer</th></tr></thead>
+    <tbody>
+      <tr><td><code>Validate failed: Migrations have failed validation</code></td><td>Uma migração aplicada foi editada</td><td>Volte o arquivo ao original e crie uma nova versão</td></tr>
+      <tr><td><code>Unsupported Database</code> no Flyway</td><td>Falta o módulo do banco</td><td>O <code>pom.xml</code> já traz os quatro; confira se não foi removido</td></tr>
+      <tr><td>Acentos trocados no MySQL</td><td>Banco criado com outro charset</td><td>Recrie com <code>utf8mb4</code> e <code>utf8mb4_0900_ai_ci</code></td></tr>
+      <tr><td><code>ORA-01950: no privileges on tablespace</code></td><td>Usuário Oracle sem cota</td><td><code>ALTER USER prelo QUOTA UNLIMITED ON USERS</code></td></tr>
+      <tr><td><code>Login failed for user</code> no SQL Server</td><td>Login ou banco ainda não criados</td><td>Espere o contêiner auxiliar terminar ou crie como no capítulo 10</td></tr>
+      <tr><td>Horários deslocados em 3 horas</td><td>Leitura direta no banco, em UTC</td><td>É o esperado: converta para <code>America/Sao_Paulo</code> na consulta</td></tr>
+      <tr><td><code>estoque_insuficiente</code> com estoque positivo</td><td>Outro checkout reservou antes</td><td>Comportamento correto; a pessoa ajusta o carrinho</td></tr>
+    </tbody>
+  </table>
+</section>
+</body>
+</html>

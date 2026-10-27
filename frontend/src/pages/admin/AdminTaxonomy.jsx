@@ -5,8 +5,8 @@ import { post, put } from '../../lib/api.js';
 import { useFetch } from '../../lib/hooks.js';
 import { useToast } from '../../lib/toast.jsx';
 
-// Tintas da livraria para a cor de cada categoria
-const PALETTE = ['#C8236A', '#0A84B8', '#F2C230', '#1B1B1D', '#D6D6CF', '#E4E4DD'];
+// Cores da marca para a cor de cada categoria
+const PALETTE = ['#B86B84', '#8E3B59', '#E0B94F', '#3F5F4B', '#4E6178', '#212121', '#DADADA'];
 
 function CategoryRow({ c, onSave }) {
   const [v, setV] = useState(c);
@@ -47,7 +47,7 @@ export default function AdminTaxonomy() {
   async function addCategory(e) {
     e.preventDefault();
     try {
-      await post('/api/admin/categories', { name, description: null, accent: '#C8236A', sortOrder: (categories.data?.length || 0) + 1, active: true });
+      await post('/api/admin/categories', { name, description: null, accent: '#B86B84', sortOrder: (categories.data?.length || 0) + 1, active: true });
       setName('');
       categories.reload();
     } catch (err) { toast(err.message, { error: true }); }

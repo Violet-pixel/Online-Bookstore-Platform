@@ -15,6 +15,9 @@ import Order from './pages/Order.jsx';
 import Account from './pages/Account.jsx';
 import Auth from './pages/Auth.jsx';
 import NotFound from './pages/NotFound.jsx';
+import Wishlist from './pages/Wishlist.jsx';
+import Author from './pages/Author.jsx';
+import Shortcuts from './components/Shortcuts.jsx';
 
 const Admin = lazy(() => import('./pages/admin/Admin.jsx'));
 
@@ -29,12 +32,13 @@ function Private({ children, admin }) {
 
 export default function App() {
   const { pathname } = useLocation();
-  useEffect(() => window.scrollTo({ top: 0, behavior: 'instant' }), [pathname]);
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [pathname]);
   const bare = pathname === '/entrar' || pathname === '/cadastro';
   return (
     <>
+      <a className="skip-link" href="#conteudo">Pular para o conteúdo</a>
       <Header />
-      <main key={pathname.split('/').slice(0, 2).join('/')}>
+      <main id="conteudo" key={pathname.split('/').slice(0, 2).join('/')}>
         <Suspense fallback={<div className="container" style={{ padding: 60 }}><div className="skeleton" style={{ height: 300 }} /></div>}>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -43,6 +47,8 @@ export default function App() {
             <Route path="/categorias/:slug" element={<Catalog mode="category" />} />
             <Route path="/catalogos/:slug" element={<Catalog mode="catalog" />} />
             <Route path="/livro/:slug" element={<Book />} />
+            <Route path="/autor/:slug" element={<Author />} />
+            <Route path="/quero-ler" element={<Wishlist />} />
             <Route path="/carrinho" element={<Cart />} />
             <Route path="/checkout" element={<Private><Checkout /></Private>} />
             <Route path="/compras" element={<Private><Orders /></Private>} />
@@ -57,6 +63,7 @@ export default function App() {
       </main>
       {!bare && <Footer />}
       <CartDrawer />
+      <Shortcuts />
     </>
   );
 }

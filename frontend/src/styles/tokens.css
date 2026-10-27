@@ -1,168 +1,184 @@
-/* Prelo: papel-algodão, tinta de prensa e as três tintas de processo (ciano, magenta, amarelo). */
+/* Prelo · tokens
+   Paleta tirada do próprio logo (a pilha de livros): tinta grafite, malva e mostarda sobre papel neutro.
+   Tipografia igual à do Lume (Document-Library-Platform): Literata para títulos e livros, Public Sans para a
+   interface e IBM Plex Mono só para identificadores (ISBN, pedido, rastreio, cupom) e para a ficha catalográfica. */
+
 @font-face {
-  font-family: 'Gloock';
+  font-family: 'Public Sans Variable';
   font-style: normal;
-  font-weight: 400;
   font-display: swap;
-  src: url('/fonts/gloock-latin-400-normal.woff2') format('woff2');
+  font-weight: 100 900;
+  src: url('/fonts/public-sans-latin-wght-normal.woff2') format('woff2-variations');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'Gloock';
+  font-family: 'Public Sans Variable';
   font-style: normal;
-  font-weight: 400;
   font-display: swap;
-  src: url('/fonts/gloock-latin-ext-400-normal.woff2') format('woff2');
+  font-weight: 100 900;
+  src: url('/fonts/public-sans-latin-ext-wght-normal.woff2') format('woff2-variations');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 @font-face {
-  font-family: 'Libre Franklin';
+  font-family: 'Literata Variable';
   font-style: normal;
-  font-weight: 100 900;
   font-display: swap;
-  src: url('/fonts/libre-franklin-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 200 900;
+  src: url('/fonts/literata-latin-wght-normal.woff2') format('woff2-variations');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'Libre Franklin';
+  font-family: 'Literata Variable';
   font-style: normal;
-  font-weight: 100 900;
   font-display: swap;
-  src: url('/fonts/libre-franklin-latin-ext-wght-normal.woff2') format('woff2-variations');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  font-weight: 200 900;
+  src: url('/fonts/literata-latin-ext-wght-normal.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+20A0-20AB, U+20AD-20C0, U+A720-A7FF;
 }
 @font-face {
-  font-family: 'Libre Franklin';
+  font-family: 'Literata Variable';
   font-style: italic;
-  font-weight: 100 900;
   font-display: swap;
-  src: url('/fonts/libre-franklin-latin-wght-italic.woff2') format('woff2-variations');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  font-weight: 200 900;
+  src: url('/fonts/literata-latin-wght-italic.woff2') format('woff2-variations');
 }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-display: swap; font-weight: 400; src: url('/fonts/ibm-plex-mono-latin-400-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-display: swap; font-weight: 400; src: url('/fonts/ibm-plex-mono-latin-ext-400-normal.woff2') format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+20A0-20AB, U+20AD-20C0, U+A720-A7FF; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: italic; font-display: swap; font-weight: 400; src: url('/fonts/ibm-plex-mono-latin-400-italic.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-display: swap; font-weight: 500; src: url('/fonts/ibm-plex-mono-latin-500-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-display: swap; font-weight: 500; src: url('/fonts/ibm-plex-mono-latin-ext-500-normal.woff2') format('woff2'); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+20A0-20AB, U+20AD-20C0, U+A720-A7FF; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-display: swap; font-weight: 600; src: url('/fonts/ibm-plex-mono-latin-600-normal.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F; }
 
 :root {
-  /* tintas de processo (fixas nos dois temas) */
-  --cyan: #0A84B8;
-  --magenta: #C8236A;
-  --yellow: #F2C230;
-  --key: #1B1B1D;
-  --cyan-ghost: rgba(10, 132, 184, .55);
-  --magenta-ghost: rgba(200, 35, 106, .55);
+  /* cores da marca (fixas nos dois temas) */
+  --grafite: #211F22;
+  --malva: #8E3B59;
+  --malva-logo: #B86B84;
+  --mostarda: #E0B94F;
+  --papel-claro: #F4F2EF;
 
-  /* nomes antigos mantidos para quem ainda usa (administração) */
-  --ink: #1B1B1D;
-  --mist: #E8E6E1;
-  --rose: #C8236A;
-  --gold: #F2C230;
-  --stone: #D6D6CF;
-  --butter: #F2C230;
-
-  --bg: #F6F6F2;
-  --bg-soft: #EDEDE7;
+  /* papéis */
+  --bg: #F4F2EF;
+  --bg-soft: #EBE8E4;
   --surface: #FFFFFF;
-  --surface-2: #F1F1EC;
-  --line: #D6D6CF;
-  --line-soft: #E4E4DD;
-  --text: #1B1B1D;
-  --text-2: #4A4A50;
-  --text-3: #6B6B70;
-  --accent: #C8236A;
-  --accent-strong: #A31A55;
-  --accent-soft: #F7E1EA;
-  --accent-ink: #FFFFFF;
-  --link: #086C97;
-  --info-soft: #DDEFF7;
-  --gold-soft: #FBF0C8;
-  --butter-soft: #FBF0C8;
-  --gold-ink: #6E5200;
-  --success: #2B7A4B;
-  --success-soft: #E0F0E6;
-  --danger: #B3261E;
-  --danger-soft: #F8E2DF;
-  --shadow-sm: 0 1px 0 rgba(27, 27, 29, .06);
-  --shadow: 0 18px 40px -18px rgba(27, 27, 29, .45), 0 2px 4px rgba(27, 27, 29, .06);
-  --shadow-lg: 0 30px 60px -24px rgba(27, 27, 29, .5);
-  --overlay: rgba(20, 20, 22, .48);
+  --surface-2: #F8F6F4;
+  --shelf: #E6E1DB;
+  --line: #E2DDD9;
+  --line-strong: #CFC8C3;
 
-  --font-serif: 'Gloock', 'Bodoni 72', Didot, Georgia, serif;
-  --font-sans: 'Libre Franklin', 'Franklin Gothic', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-code: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
-  --radius-xs: 2px;
-  --radius-sm: 3px;
-  --radius: 2px;
-  --radius-lg: 6px;
+  /* tinta */
+  --text: #211F22;
+  --text-2: #5F5A61;
+  --text-3: #6E6870;
+
+  /* ação principal: malva */
+  --accent: #8E3B59;
+  --accent-strong: #742C47;
+  --accent-soft: #F3E4EA;
+  --accent-ink: #FFFFFF;
+  --link: #8E3B59;
+
+  /* etiqueta de preço e destaques: mostarda */
+  --tag: #E0B94F;
+  --tag-soft: #F8EDCB;
+  --tag-ink: #4D3A06;
+
+  --success: #3E6B4F;
+  --success-soft: #E2EEE5;
+  --danger: #A3352B;
+  --danger-soft: #F6E1DE;
+  --info: #2F5E8A;
+  --info-soft: #E1EAF3;
+
+  --shadow-sm: 0 1px 2px rgba(33, 31, 34, .06);
+  --shadow: 0 1px 2px rgba(33, 31, 34, .05), 0 8px 24px -12px rgba(33, 31, 34, .22);
+  --shadow-lg: 0 24px 56px -20px rgba(33, 31, 34, .38), 0 2px 6px rgba(33, 31, 34, .06);
+  --book-shadow: 0 1px 1px rgba(33, 31, 34, .12), 0 10px 18px -10px rgba(33, 31, 34, .45);
+  --overlay: rgba(28, 24, 27, .46);
+
+  --font-serif: 'Literata Variable', 'Literata', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Public Sans Variable', 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  /* raios por hierarquia: capas quase retas, controles levemente arredondados, painéis um pouco mais */
+  --r-cover: 2px;
+  --r-control: 7px;
+  --r-panel: 12px;
+  --r-pill: 999px;
+
   --ease: cubic-bezier(.2, .7, .2, 1);
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
   --fast: 140ms;
   --med: 240ms;
-  --slow: 600ms;
   --page: 1240px;
+  --header-h: 64px;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --mist: #E8E6E1;
-    --bg: #141416;
-    --bg-soft: #1F1F23;
-    --surface: #1C1C1F;
-    --surface-2: #232327;
-    --line: #36363C;
-    --line-soft: #2A2A2F;
-    --text: #E8E6E1;
-    --text-2: #B8B6B0;
-    --text-3: #8F8D88;
-    --accent: #E2508F;
-    --accent-strong: #EF77A9;
-    --accent-soft: #3A1F2C;
-    --accent-ink: #141416;
-    --link: #4DB4E2;
-    --info-soft: #14303D;
-    --gold-soft: #3A321A;
-    --butter-soft: #2F2A18;
-    --gold-ink: #F2C230;
-    --success: #6CC08E;
-    --success-soft: #19301F;
-    --danger: #EE7B70;
-    --danger-soft: #3A201D;
-    --cyan-ghost: rgba(77, 180, 226, .5);
-    --magenta-ghost: rgba(226, 80, 143, .55);
-    --shadow-sm: 0 1px 0 rgba(0, 0, 0, .4);
-    --shadow: 0 18px 40px -18px rgba(0, 0, 0, .8);
-    --shadow-lg: 0 30px 60px -24px rgba(0, 0, 0, .85);
+    --bg: #19171A;
+    --bg-soft: #211E22;
+    --surface: #222024;
+    --surface-2: #29262B;
+    --shelf: #3A353B;
+    --line: #353137;
+    --line-strong: #48434A;
+    --text: #EEEAEC;
+    --text-2: #BDB6BA;
+    --text-3: #9C959A;
+    --accent: #DB8CA6;
+    --accent-strong: #E9A9BE;
+    --accent-soft: #3A2530;
+    --accent-ink: #19171A;
+    --link: #E29BB2;
+    --tag: #E8C463;
+    --tag-soft: #3A3219;
+    --tag-ink: #F3DC98;
+    --success: #7DBB94;
+    --success-soft: #1E3027;
+    --danger: #E88A7E;
+    --danger-soft: #3A221F;
+    --info: #7FB0DB;
+    --info-soft: #1B2A38;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 26px -12px rgba(0, 0, 0, .7);
+    --shadow-lg: 0 24px 56px -20px rgba(0, 0, 0, .85);
+    --book-shadow: 0 1px 1px rgba(0, 0, 0, .4), 0 12px 20px -10px rgba(0, 0, 0, .8);
     --overlay: rgba(0, 0, 0, .62);
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --mist: #E8E6E1;
-  --bg: #141416;
-  --bg-soft: #1F1F23;
-  --surface: #1C1C1F;
-  --surface-2: #232327;
-  --line: #36363C;
-  --line-soft: #2A2A2F;
-  --text: #E8E6E1;
-  --text-2: #B8B6B0;
-  --text-3: #8F8D88;
-  --accent: #E2508F;
-  --accent-strong: #EF77A9;
-  --accent-soft: #3A1F2C;
-  --accent-ink: #141416;
-  --link: #4DB4E2;
-  --info-soft: #14303D;
-  --gold-soft: #3A321A;
-  --butter-soft: #2F2A18;
-  --gold-ink: #F2C230;
-  --success: #6CC08E;
-  --success-soft: #19301F;
-  --danger: #EE7B70;
-  --danger-soft: #3A201D;
-  --cyan-ghost: rgba(77, 180, 226, .5);
-  --magenta-ghost: rgba(226, 80, 143, .55);
-  --shadow-sm: 0 1px 0 rgba(0, 0, 0, .4);
-  --shadow: 0 18px 40px -18px rgba(0, 0, 0, .8);
-  --shadow-lg: 0 30px 60px -24px rgba(0, 0, 0, .85);
+  --bg: #19171A;
+  --bg-soft: #211E22;
+  --surface: #222024;
+  --surface-2: #29262B;
+  --shelf: #3A353B;
+  --line: #353137;
+  --line-strong: #48434A;
+  --text: #EEEAEC;
+  --text-2: #BDB6BA;
+  --text-3: #9C959A;
+  --accent: #DB8CA6;
+  --accent-strong: #E9A9BE;
+  --accent-soft: #3A2530;
+  --accent-ink: #19171A;
+  --link: #E29BB2;
+  --tag: #E8C463;
+  --tag-soft: #3A3219;
+  --tag-ink: #F3DC98;
+  --success: #7DBB94;
+  --success-soft: #1E3027;
+  --danger: #E88A7E;
+  --danger-soft: #3A221F;
+  --info: #7FB0DB;
+  --info-soft: #1B2A38;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 26px -12px rgba(0, 0, 0, .7);
+  --shadow-lg: 0 24px 56px -20px rgba(0, 0, 0, .85);
+  --book-shadow: 0 1px 1px rgba(0, 0, 0, .4), 0 12px 20px -10px rgba(0, 0, 0, .8);
   --overlay: rgba(0, 0, 0, .62);
   color-scheme: dark;
 }

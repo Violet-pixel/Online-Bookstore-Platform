@@ -12,12 +12,13 @@ export function Price({ price, listPrice, size }) {
   );
 }
 
-export function Stars({ rating, count }) {
+export function Stars({ rating, count, compact }) {
   if (!count) return null;
+  const r = Number(rating).toFixed(1).replace('.', ',');
   return (
-    <span className="stars" title={`${Number(rating).toFixed(1)} de 5`}>
-      <Star fill="currentColor" strokeWidth={0} /> {Number(rating).toFixed(1).replace('.', ',')}
-      <span>({count.toLocaleString('pt-BR')})</span>
+    <span className="stars" title={`Nota ${r} de 5, ${count.toLocaleString('pt-BR')} avaliações`}>
+      <Star fill="currentColor" strokeWidth={0} aria-hidden="true" /> {r}
+      {!compact && <span>({count.toLocaleString('pt-BR')})</span>}
     </span>
   );
 }
@@ -68,13 +69,11 @@ export function Field({ label, error, hint, children }) {
 export function EmptyArt() {
   return (
     <svg className="art" viewBox="0 0 140 110" aria-hidden="true">
-      <ellipse cx="70" cy="100" rx="52" ry="6" fill="var(--bg-soft)" />
-      <rect x="28" y="70" width="84" height="18" fill="var(--text)" />
-      <rect x="36" y="50" width="72" height="18" fill="#C8236A" />
-      <rect x="30" y="30" width="76" height="18" fill="#F2C230" transform="rotate(-6 68 39)" />
-      <circle cx="96" cy="16" r="6" fill="#0A84B8">
-        <animate attributeName="cy" values="16;10;16" dur="2.4s" repeatCount="indefinite" />
-      </circle>
+      <rect x="14" y="96" width="112" height="4" rx="1" fill="var(--line-strong)" />
+      <rect x="30" y="44" width="16" height="52" rx="1.5" fill="var(--text)" />
+      <rect x="48" y="36" width="12" height="60" rx="1.5" fill="#B86B84" />
+      <rect x="62" y="50" width="18" height="46" rx="1.5" fill="#E0B94F" />
+      <rect x="86" y="40" width="14" height="56" rx="1.5" fill="#4E6178" transform="rotate(14 93 96)" />
     </svg>
   );
 }

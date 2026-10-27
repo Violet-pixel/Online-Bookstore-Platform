@@ -26,8 +26,9 @@
 | [`Manual-Prelo.pdf`](Manual-Prelo.pdf) ([cópia em `docs/`](docs/Manual-Prelo.pdf)) | Instalação, cada tela da loja e da administração, janela de pagamento, envio, arquitetura, segurança, API, configuração, testes e solução de problemas |
 | [`Banco-de-Dados-Prelo.pdf`](Banco-de-Dados-Prelo.pdf) ([cópia em `docs/`](docs/Banco-de-Dados-Prelo.pdf)) | Diagrama de relacionamentos, todas as tabelas com campos, tipos e chaves, os tipos equivalentes nos quatro bancos, máquinas de estado, regras do esquema e como preparar cada banco |
 
-Os dois manuais são da versão 1.1.0. O HTML de onde eles saem fica em `.design/docs-src/`; para gerar de novo,
-rode `python3 .design/docs-src/render.py` (precisa de Python com Playwright e pypdf).
+Os dois manuais são da versão 1.1.0, já com a interface nova. O HTML e o CSS de onde eles saem ficam em
+`docs/fonte/`; para gerar de novo, rode `python docs/fonte/gerar_pdfs.py` (precisa de `pip install weasyprint==70.0`).
+O script grava o PDF na raiz e uma cópia idêntica em `docs/`.
 
 ## O que o Prelo faz
 
@@ -47,10 +48,39 @@ rode `python3 .design/docs-src/render.py` (precisa de Python com Playwright e py
   de entrega e linha do tempo.
 - Administração com painel (receita, ticket médio, pedidos por status, estoque baixo e mais vendidos),
   pedidos e envios, livros e estoque, categorias e catálogos.
+- Quero ler: marcador em cada livro que guarda a lista no navegador e avisa quando o preço baixa ou o livro
+  volta ao estoque, com botão para mover tudo o que está disponível para o carrinho.
+- Busca com sugestões enquanto você digita (capa, autoria e preço), navegação pelo teclado e buscas recentes.
+- Página de cada pessoa autora, vistos por último, comprar de novo, comprovante para imprimir e atalhos de
+  teclado (aperte `?`).
+- Exportação em CSV de pedidos e de livros na administração, e filtros de estoque baixo, esgotados e fora da loja.
 - Tema claro e escuro e layout para celular.
 
 <p align="center">
   <img src="docs/images/tela-livro.png" alt="Página do livro com preço, estoque, cálculo de frete e ficha técnica">
+</p>
+
+### Novidades da interface
+
+Esta rodada mexe só na interface. Rotas da API, banco e regras de negócio continuam iguais aos da 1.1.0.
+
+- Identidade nova: a vitrine abre com uma estante de lombadas de verdade (a largura vem do número de páginas e
+  a altura, do formato) e as capas geradas viraram capas de tecido e papel, com etiqueta, faixa, moldura e vinco
+  da lombada. A paleta sai do próprio logo: grafite, malva e mostarda sobre papel neutro.
+- Tipografia igual à do Lume: Literata nos títulos e nos livros, Public Sans no texto e IBM Plex Mono só para
+  identificadores (ISBN, pedido, rastreio, CEP, cupom) e para a ficha catalográfica da página do livro.
+- Barra de estantes logo abaixo do cabeçalho, com as categorias a um clique.
+- Página do livro com links para a autoria, tempo estimado de leitura, compartilhamento, ficha catalográfica e
+  vistos por último.
+- Quero ler, busca com sugestões, página de autoria, comprar de novo, comprovante para imprimir, atalhos de
+  teclado e exportação em CSV (veja a lista acima).
+- Correção: a rolagem ao trocar de página e o menu da conta quebravam em navegadores em que `window.scrollTo`
+  devolve uma Promise.
+
+- Manuais em PDF refeitos com a identidade nova e as capturas atuais; o HTML deles agora fica em `docs/fonte/`.
+
+<p align="center">
+  <img src="docs/images/tela-quero-ler.png" alt="Quero ler com aviso de queda de preço e de volta ao estoque">
 </p>
 
 ### Novidades da 1.1.0
@@ -60,7 +90,8 @@ iguais aos da 1.0.0.
 
 - Visual novo inspirado em oficina tipográfica: papel-algodão, tinta preta e as três tintas de processo
   (magenta para ações, ciano para links, amarelo para destaques), com filetes finos no lugar de caixas.
-- Tipografia nova: Gloock nos títulos e Libre Franklin no texto, servidas pelo próprio projeto.
+- Tipografia nova: Gloock nos títulos e Libre Franklin no texto (trocadas depois por Literata, Public Sans e IBM
+  Plex Mono).
 - Alguns rótulos mudaram: Ver carrinho e fechar pedido na gaveta, Fechar pedido no carrinho, Da mesma
   estante na página do livro e Catálogos na página de categorias.
 - Capturas de tela e manuais em PDF refeitos.
@@ -249,7 +280,7 @@ frontend/                 interface React + Vite, servida pelo nginx no Docker
   src/pages/              vitrine, catálogo, livro, carrinho, checkout, compras, conta, administração
   src/components/         capas geradas, janela de pagamento, linha do tempo do envio, gaveta do carrinho
 docs/                     manuais em PDF e imagens do README
-.design/docs-src/         HTML, estilo e script que geram os manuais
+docs/fonte/               HTML, estilo e script que geram os manuais
 .github/workflows/        integração contínua (testes nos quatro bancos)
 ```
 
@@ -347,8 +378,10 @@ O Prelo depende de componentes com licenças próprias, que continuam valendo pa
 | [Vite](https://vite.dev/) | Build da interface | MIT |
 | [Lucide](https://lucide.dev/) | Ícones da interface | ISC |
 | [node-qrcode](https://github.com/soldair/node-qrcode) | QR Code do Pix | MIT |
-| [Gloock](https://github.com/duartp/gloock) e [Libre Franklin](https://github.com/impallari/Libre-Franklin) | Fontes da interface e dos manuais | SIL Open Font License 1.1 |
-| [IBM Plex Mono](https://github.com/IBM/plex) | Fonte do código nos manuais | SIL Open Font License 1.1 |
+| [Literata](https://github.com/googlefonts/literata) e [Public Sans](https://github.com/uswds/public-sans) | Fontes da interface e dos manuais | SIL Open Font License 1.1 |
+| [IBM Plex Mono](https://github.com/IBM/plex) | Identificadores e ficha catalográfica na interface, código nos manuais | SIL Open Font License 1.1 |
+| [Mermaid](https://mermaid.js.org/) | Diagrama de relacionamentos do manual do banco (só na geração) | MIT |
+| [WeasyPrint](https://weasyprint.org/) | Geração dos manuais em PDF (só na geração) | BSD-3-Clause |
 | Drivers JDBC do [PostgreSQL](https://jdbc.postgresql.org/), [MySQL](https://dev.mysql.com/downloads/connector/j/), [SQL Server](https://github.com/microsoft/mssql-jdbc) e [Oracle](https://www.oracle.com/database/technologies/appdev/jdbc.html) | Acesso aos bancos | BSD-2-Clause, GPLv2 com exceção FOSS, MIT e Oracle FUTC |
 
 PostgreSQL, MySQL, SQL Server, Oracle e Redis rodam como serviços externos via Docker e não são

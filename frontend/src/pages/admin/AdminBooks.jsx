@@ -1,8 +1,10 @@
-import { Check, Plus, Search } from 'lucide-react';
+import { Check, Download, Plus, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import BookCover from '../../components/BookCover.jsx';
-import { Pager } from '../../components/Bits.jsx';
+import { Pager, Spinner } from '../../components/Bits.jsx';
+import { decimal, downloadCsv, fetchAll, today } from '../../lib/csv.js';
+import { FORMAT } from '../../lib/format.js';
 import { patch, qs } from '../../lib/api.js';
 import { money } from '../../lib/format.js';
 import { useFetch } from '../../lib/hooks.js';
@@ -33,23 +35,44 @@ export default function AdminBooks() {
   const page = Number(params.get('pagina') || 0);
   const [term, setTerm] = useState(q);
   const { data, setData } = useFetch(`/api/admin/books${qs({ q, page, size: 15 })}`);
+  const toast = useToast();
+  const [exporting, setExporting] = useState(false);
+  const [only, setOnly] = useState('');
+  async function exportCsv() {
+    setExporting(true);
+    try {
+      const rows = await fetchAll('/api/admin/books', { q });
+      downloadCsv(`prelo-livros-${today()}.csv`, [
+        ['ISBN', (b) => b.isbn], ['Título', (b) => b.title], ['Autores', (b) => b.authors.join(', ')], ['Categoria', (b) => b.categoryName],
+        ['Formato', (b) => FORMAT[b.format] || b.format], ['Preço (R$)', (b) => decimal(b.price)], ['Preço de capa (R$)', (b) => decimal(b.listPrice)],
+        ['Estoque', (b) => b.stockQuantity], ['Vendidos', (b) => b.soldCount], ['À venda', (b) => (b.active ? 'sim' : 'não')],
+      ], rows);
+      toast(`${rows.length} livros exportados`);
+    } catch (e) { toast(e.message, { error: true }); } finally { setExporting(false); }
+  }
   const replace = (b) => setData({ ...data, items: data.items.map((x) => (x.id === b.id ? b : x)) });
   return (
     <div className="stack fade" style={{ gap: 18 }}>
       <div className="row between wrap"><h1>Livros e estoque</h1>
         <div className="row">
           <form className="search" style={{ maxWidth: 280 }} onSubmit={(e) => { e.preventDefault(); setParams(term ? { q: term } : {}); }}>
-            <Search className="icon" /><input value={term} onChange={(e) => setTerm(e.target.value)} placeholder="Título, autor, ISBN" />
+            <Search className="icon" /><input value={term} onChange={(e) => setTerm(e.target.value)} placeholder="Título, autor, ISBN" aria-label="Buscar livros" />
           </form>
+          <button type="button" className="btn" onClick={exportCsv} disabled={exporting}>{exporting ? <Spinner /> : <Download size={15} />} Exportar CSV</button>
           <Link to="/admin/livros/novo" className="btn btn-primary"><Plus size={16} /> Novo livro</Link>
         </div>
+      </div>
+      <div className="subnav" style={{ padding: 0 }}>
+        {[['', 'Todos nesta página'], ['low', 'Estoque baixo (até 5)'], ['out', 'Esgotados'], ['off', 'Fora da loja']].map(([k, v]) => (
+          <button key={k} type="button" className={`chip ${only === k ? 'on' : ''}`} onClick={() => setOnly(k)}>{v}</button>
+        ))}
       </div>
       <div className="card" style={{ padding: 0 }}>
         <div className="table-wrap">
           <table className="table">
             <thead><tr><th>Livro</th><th>Categoria</th><th>Preço</th><th>Vendidos</th><th>Estoque</th><th /></tr></thead>
             <tbody>
-              {data?.items.map((b) => (
+              {data?.items.filter((b) => (only === 'low' ? b.stockQuantity > 0 && b.stockQuantity <= 5 : only === 'out' ? b.stockQuantity === 0 : only === 'off' ? !b.active : true)).map((b) => (
                 <tr key={b.id} style={{ opacity: b.active ? 1 : 0.5 }}>
                   <td>
                     <div className="row" style={{ gap: 12 }}>
@@ -60,7 +83,7 @@ export default function AdminBooks() {
                   <td className="subtle">{b.categoryName}</td>
                   <td style={{ fontWeight: 600 }}>{money(b.price)}</td>
                   <td className="subtle">{b.soldCount}</td>
-                  <td><StockCell key={`${b.id}-${b.stockQuantity}`} book={b} onSaved={replace} /></td>
+                  <td className={b.stockQuantity === 0 ? 'stock-cell out' : b.stockQuantity <= 5 ? 'stock-cell low' : 'stock-cell'}><StockCell key={`${b.id}-${b.stockQuantity}`} book={b} onSaved={replace} /></td>
                   <td><Link to={`/admin/livros/${b.id}`} className="btn btn-sm">Editar</Link></td>
                 </tr>
               ))}

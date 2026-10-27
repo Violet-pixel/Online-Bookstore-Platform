@@ -1,12 +1,31 @@
-import { Plus } from 'lucide-react';
+import { Bookmark, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { useCart } from '../lib/cart.jsx';
+import { useLibrary } from '../lib/library.jsx';
 import { useToast } from '../lib/toast.jsx';
 import BookCover from './BookCover.jsx';
 import { Price, Spinner, Stars } from './Bits.jsx';
 
-export default function BookCard({ book, index = 0 }) {
+export function SaveButton({ book, className = '' }) {
+  const { saved, toggle } = useLibrary();
+  const toast = useToast();
+  const on = saved(book.id);
+  return (
+    <button type="button" className={`save-btn ${on ? 'on' : ''} ${className}`} aria-pressed={on}
+      aria-label={on ? `Tirar ${book.title} de Quero ler` : `Guardar ${book.title} em Quero ler`}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const added = toggle(book);
+        toast(added ? `“${book.title}” guardado em Quero ler` : 'Tirado de Quero ler', added ? { action: { to: '/quero-ler', label: 'Abrir' } } : {});
+      }}>
+      <Bookmark size={16} fill={on ? 'currentColor' : 'none'} />
+    </button>
+  );
+}
+
+export default function BookCard({ book }) {
   const { add } = useCart();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
@@ -25,23 +44,27 @@ export default function BookCard({ book, index = 0 }) {
   }
 
   return (
-    <Link to={`/livro/${book.slug}`} className="book-card">
-      <div className="cover-wrap" style={{ position: 'relative' }}>
+    <article className="book-card">
+      <Link to={`/livro/${book.slug}`} className="cover-wrap" aria-label={book.title}>
         <BookCover title={book.title} authors={book.authors} style={book.coverStyle} />
-        {book.inStock ? (
-          <button type="button" className="btn btn-primary btn-icon btn-sm quick" onClick={quickAdd} aria-label={`Adicionar ${book.title} ao carrinho`}>
+        {!book.inStock && <span className="flag">Esgotado</span>}
+      </Link>
+      <div className="card-actions">
+        <SaveButton book={book} />
+        {book.inStock && (
+          <button type="button" className="add-btn" onClick={quickAdd} aria-label={`Adicionar ${book.title} ao carrinho`}>
             {busy ? <Spinner size={14} /> : <Plus size={16} />}
           </button>
-        ) : (
-          <span className="badge dark flag">Esgotado</span>
         )}
       </div>
-      <div className="meta">
+      <Link to={`/livro/${book.slug}`} className="meta">
         <span className="title">{book.title}</span>
         <span className="author">{book.authors?.join(', ')}</span>
-        <Stars rating={book.rating} count={book.ratingCount} />
+      </Link>
+      <div className="foot">
+        <Price price={book.price} listPrice={book.listPrice} />
+        <Stars rating={book.rating} count={book.ratingCount} compact />
       </div>
-      <Price price={book.price} listPrice={book.listPrice} />
-    </Link>
+    </article>
   );
 }

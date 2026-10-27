@@ -1,19 +1,28 @@
-import { Check, Minus, Plus, ShoppingBag, Truck, Zap } from 'lucide-react';
-import { useState } from 'react';
+import { Check, Minus, Plus, Share2, ShoppingBag, Truck } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import BookCard from '../components/BookCard.jsx';
+import { SaveButton } from '../components/BookCard.jsx';
 import BookCover from '../components/BookCover.jsx';
 import { Empty, Price, Spinner, Stars } from '../components/Bits.jsx';
 import { post } from '../lib/api.js';
 import { useCart } from '../lib/cart.jsx';
 import { FORMAT, money } from '../lib/format.js';
 import { useFetch, useTitle } from '../lib/hooks.js';
+import { useLibrary } from '../lib/library.jsx';
 import { useToast } from '../lib/toast.jsx';
+import { Rail } from './Home.jsx';
+
+function readingTime(pages) {
+  if (!pages) return null;
+  const hours = Math.round((pages * 1.6) / 60);
+  return hours <= 1 ? 'cerca de 1 hora de leitura' : `cerca de ${hours} horas de leitura`;
+}
 
 export default function Book() {
   const { slug } = useParams();
   const { data: b, loading, error } = useFetch(`/api/books/${slug}`);
-  const { add, setOpen } = useCart();
+  const { add } = useCart();
+  const { seen, recent } = useLibrary();
   const toast = useToast();
   const navigate = useNavigate();
   const [qty, setQty] = useState(1);
@@ -23,7 +32,14 @@ export default function Book() {
   const [quote, setQuote] = useState(null);
   useTitle(b?.title);
 
-  if (error) return <div className="container page"><Empty title="Livro não encontrado" action={<Link to="/livros" className="btn btn-dark">Ver catálogo</Link>} /></div>;
+  useEffect(() => {
+    if (b) seen(b);
+    setQty(1);
+    setQuote(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [b?.id]);
+
+  if (error) return <div className="container page"><Empty title="Livro não encontrado" action={<Link to="/livros" className="btn btn-dark">Ver catálogo</Link>}>O endereço pode ter mudado ou o livro saiu de catálogo.</Empty></div>;
   if (loading || !b) {
     return (
       <div className="container page book-page">
@@ -33,16 +49,19 @@ export default function Book() {
     );
   }
 
+  const authors = b.authors.map((a) => a.name);
   const max = Math.min(10, b.stockQuantity);
   const installments = Math.min(6, Math.floor(Number(b.price) / 30));
+  const others = recent.filter((r) => r.id !== b.id);
+
   async function addToCart(buyNow) {
     setBusy(true);
     try {
-      await add({ ...b, authors: b.authors.map((a) => a.name) }, qty);
+      await add({ ...b, authors }, qty);
       setAdded(true);
       setTimeout(() => setAdded(false), 1600);
       if (buyNow) navigate('/carrinho');
-      else toast(`${qty > 1 ? `${qty} unidades` : '1 unidade'} no carrinho`, { action: { to: '/carrinho', label: 'Ver' } });
+      else toast(`${qty > 1 ? `${qty} exemplares` : '1 exemplar'} no carrinho`, { action: { to: '/carrinho', label: 'Ver' } });
     } catch (e) {
       toast(e.message, { error: true });
     } finally {
@@ -57,80 +76,112 @@ export default function Book() {
       toast(err.message, { error: true });
     }
   }
+  async function share() {
+    const url = window.location.href;
+    try {
+      if (navigator.share) await navigator.share({ title: b.title, text: `${b.title}, de ${authors.join(', ')}`, url });
+      else {
+        await navigator.clipboard.writeText(url);
+        toast('Link copiado');
+      }
+    } catch { /* compartilhamento cancelado */ }
+  }
 
   return (
     <div className="container page">
+      <div className="crumbs">
+        <Link to="/">Início</Link><span aria-hidden="true">/</span><Link to={`/categorias/${b.category.slug}`}>{b.category.name}</Link>
+      </div>
       <div className="book-page">
-        <div className="cover-stage"><BookCover title={b.title} authors={b.authors.map((a) => a.name)} style={b.coverStyle} /></div>
-        <div>
-          <div className="crumbs">
-            <Link to="/">Início</Link><span>/</span><Link to={`/categorias/${b.category.slug}`}>{b.category.name}</Link>
-          </div>
-          <h1 className="misreg" style={{ marginTop: 16 }}>{b.title}</h1>
-          {b.subtitle && <p className="muted serif" style={{ fontSize: 22, marginTop: 10 }}>{b.subtitle}</p>}
-          <div className="row wrap" style={{ marginTop: 14, gap: 14 }}>
-            <span style={{ fontWeight: 700 }}>{b.authors.map((a) => a.name).join(', ')}</span>
+        <div className="cover-stage">
+          <BookCover title={b.title} authors={authors} style={b.coverStyle} />
+        </div>
+        <div className="book-main">
+          <h1>{b.title}</h1>
+          {b.subtitle && <p className="book-sub">{b.subtitle}</p>}
+          <p className="byline">
+            {b.authors.map((a, i) => (
+              <span key={a.slug}>{i > 0 && ', '}<Link to={`/autor/${a.slug}?nome=${encodeURIComponent(a.name)}`}>{a.name}</Link></span>
+            ))}
+          </p>
+          <div className="row wrap book-facts">
             <Stars rating={b.rating} count={b.ratingCount} />
-            <span className="badge">{FORMAT[b.format]}</span>
+            <span>{FORMAT[b.format]}</span>
+            {b.pageCount && <span>{b.pageCount} páginas, {readingTime(b.pageCount)}</span>}
           </div>
 
           <div className="buy-box">
-            <div className="row between wrap">
-              <Price price={b.price} listPrice={b.listPrice} size="lg" />
-              {b.inStock ? (
-                <span className={`badge ${b.stockQuantity <= 5 ? 'gold' : 'green'}`}>
-                  {b.stockQuantity <= 5 ? `Restam só ${b.stockQuantity}` : 'Em estoque'}
-                </span>
-              ) : <span className="badge red">Esgotado</span>}
-            </div>
-            <span className="subtle">{installments > 1 ? `ou ${installments}x de ${money(Number(b.price) / installments)} sem juros` : 'à vista no Pix, boleto ou cartão'}</span>
-            {b.inStock && (
-              <div className="row wrap">
-                <div className="qty" style={{ height: 52 }}>
-                  <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Diminuir"><Minus size={15} /></button>
-                  <span>{qty}</span>
-                  <button type="button" onClick={() => setQty((q) => Math.min(max, q + 1))} disabled={qty >= max} aria-label="Aumentar"><Plus size={15} /></button>
-                </div>
-                <button type="button" className="btn btn-primary btn-lg grow" disabled={busy} onClick={() => addToCart(false)}>
-                  {busy ? <Spinner /> : added ? <Check size={18} /> : <ShoppingBag size={18} />} {added ? 'Adicionado' : 'Adicionar ao carrinho'}
-                </button>
-                <button type="button" className="btn btn-dark btn-lg" disabled={busy} onClick={() => addToCart(true)}><Zap size={17} /> Comprar agora</button>
+            <div className="row between wrap" style={{ alignItems: 'flex-end' }}>
+              <div className="stack" style={{ gap: 4 }}>
+                <Price price={b.price} listPrice={b.listPrice} size="lg" />
+                <span className="subtle">{installments > 1 ? `ou ${installments}x de ${money(Number(b.price) / installments)} sem juros no cartão` : 'à vista no Pix, boleto ou cartão'}</span>
               </div>
-            )}
-            <form className="row" onSubmit={estimate}>
-              <Truck size={18} className="muted" />
-              <input className="input" style={{ height: 40, maxWidth: 160 }} placeholder="CEP" inputMode="numeric" value={zip}
+              {b.inStock ? (
+                <span className={`stock ${b.stockQuantity <= 5 ? 'low' : ''}`}>
+                  {b.stockQuantity <= 5 ? `Restam ${b.stockQuantity} exemplares` : 'Em estoque, sai em até 1 dia útil'}
+                </span>
+              ) : <span className="stock out">Esgotado. Guarde em Quero ler para saber quando voltar.</span>}
+            </div>
+            <div className="row wrap buy-actions">
+              {b.inStock && (
+                <>
+                  <div className="qty" aria-label="Quantidade">
+                    <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Diminuir"><Minus size={15} /></button>
+                    <span aria-live="polite">{qty}</span>
+                    <button type="button" onClick={() => setQty((q) => Math.min(max, q + 1))} disabled={qty >= max} aria-label="Aumentar"><Plus size={15} /></button>
+                  </div>
+                  <button type="button" className="btn btn-primary btn-lg grow" disabled={busy} onClick={() => addToCart(false)}>
+                    {busy ? <Spinner /> : added ? <Check size={18} /> : <ShoppingBag size={18} />} {added ? 'No carrinho' : 'Adicionar ao carrinho'}
+                  </button>
+                  <button type="button" className="btn btn-lg" disabled={busy} onClick={() => addToCart(true)}>Comprar agora</button>
+                </>
+              )}
+              <SaveButton book={b} className="big" />
+              <button type="button" className="btn btn-icon btn-lg btn-ghost" onClick={share} aria-label="Compartilhar"><Share2 size={17} /></button>
+            </div>
+            <form className="ship-calc" onSubmit={estimate}>
+              <Truck size={17} aria-hidden="true" />
+              <label htmlFor="cep-livro">Frete e prazo</label>
+              <input id="cep-livro" className="input mono" placeholder="00000-000" inputMode="numeric" value={zip}
                 onChange={(e) => setZip(e.target.value.replace(/\D/g, '').slice(0, 8).replace(/^(\d{5})(\d)/, '$1-$2'))} />
-              <button type="submit" className="btn btn-sm">Calcular frete</button>
+              <button type="submit" className="btn btn-sm" disabled={zip.length < 9}>Calcular</button>
             </form>
             {quote && (
-              <div className="stack fade" style={{ gap: 6 }}>
+              <ul className="quote fade">
                 {quote.map((o) => (
-                  <div key={o.code} className="sum-row"><span>{o.name}, {o.minDays} a {o.maxDays} dias úteis</span><b>{o.free ? 'Grátis' : money(o.fee)}</b></div>
+                  <li key={o.code}><span>{o.name}, {o.minDays} a {o.maxDays} dias úteis</span><b>{o.free ? 'Grátis' : money(o.fee)}</b></li>
                 ))}
-              </div>
+              </ul>
             )}
-            <button type="button" className="btn btn-ghost btn-sm" style={{ alignSelf: 'flex-start' }} onClick={() => setOpen(true)}>Ver carrinho</button>
           </div>
 
-          <h3 style={{ marginBottom: 12 }}>Sinopse</h3>
-          <p className="synopsis">{b.synopsis}</p>
-          <div className="specs" style={{ marginTop: 26 }}>
-            <div className="spec"><span>Editora</span><b>{b.publisher}</b></div>
-            <div className="spec"><span>Ano</span><b>{b.publishedYear}</b></div>
-            <div className="spec"><span>Páginas</span><b>{b.pageCount}</b></div>
-            <div className="spec"><span>Idioma</span><b>{b.language === 'pt-BR' ? 'Português' : b.language}</b></div>
-            <div className="spec" style={{ gridColumn: 'span 2' }}><span>ISBN</span><b className="mono">{b.isbn}</b></div>
-            <div className="spec"><span>Peso</span><b>{b.weightGrams} g</b></div>
-          </div>
+          <section className="book-section">
+            <h2>Sinopse</h2>
+            <p className="synopsis">{b.synopsis}</p>
+          </section>
+
+          {b.authors.some((a) => a.bio) && (
+            <section className="book-section">
+              <h2>Sobre {authors.length > 1 ? 'os autores' : 'quem escreveu'}</h2>
+              {b.authors.filter((a) => a.bio).map((a) => <p key={a.slug} className="synopsis"><b>{a.name}.</b> {a.bio}</p>)}
+            </section>
+          )}
+
+          <section className="book-section">
+            <h2>Ficha catalográfica</h2>
+            <div className="ficha">
+              <p>{authors[0]?.split(' ').slice(-1)[0]}, {authors[0]?.split(' ').slice(0, -1).join(' ')}</p>
+              <p className="indent">{b.title}{b.subtitle ? `: ${b.subtitle.toLowerCase()}` : ''} / {authors.join(', ')}. {b.publisher}, {b.publishedYear}.</p>
+              <p className="indent">{b.pageCount ? `${b.pageCount} p.` : ''} {FORMAT[b.format].toLowerCase()}. {b.weightGrams} g.</p>
+              <p className="indent">ISBN {b.isbn}</p>
+              <p className="indent">1. {b.category.name}. I. Título.</p>
+              <p className="lang">Idioma: {b.language === 'pt-BR' ? 'português' : b.language}</p>
+            </div>
+          </section>
         </div>
       </div>
-      {b.related.length > 0 && (
-        <section className="section" style={{ marginTop: 70 }}>
-          <div className="rail-head"><div><h2>Da mesma estante</h2><p>Outros livros de {b.category.name}.</p></div></div>
-          <div className="rail">{b.related.map((r, i) => <BookCard key={r.id} book={r} index={i} />)}</div>
-        </section>
-      )}
+      {b.related.length > 0 && <Rail title="Da mesma estante" lead={`Outros livros de ${b.category.name}.`} to={`/categorias/${b.category.slug}`} books={b.related} />}
+      {others.length > 0 && <Rail title="Vistos por último" books={others} />}
     </div>
   );
 }

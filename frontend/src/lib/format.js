@@ -12,7 +12,7 @@ export const discountPct = (price, list) => (Number(list) > Number(price) ? Math
 
 export const ORDER_STATUS = {
   PENDING_PAYMENT: { label: 'Aguardando pagamento', tone: 'gold', live: true },
-  PAID: { label: 'Pago · em separação', tone: 'rose', live: true },
+  PAID: { label: 'Pago, em separação', tone: 'rose', live: true },
   SHIPPED: { label: 'A caminho', tone: 'rose', live: true },
   DELIVERED: { label: 'Entregue', tone: 'green' },
   CANCELED: { label: 'Cancelado', tone: 'red' },

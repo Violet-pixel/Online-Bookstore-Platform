@@ -1,0 +1,102 @@
+erDiagram
+  direction LR
+  app_user ||--o{ address : "user_id"
+  app_user ||--o| cart : "user_id"
+  cart ||--o{ cart_item : "cart_id"
+  book ||--o{ cart_item : "book_id"
+  app_user ||--o{ purchase_order : "user_id"
+  purchase_order ||--|{ order_item : "order_id"
+  book ||--o{ order_item : "book_id"
+  purchase_order ||--o{ payment : "order_id"
+  purchase_order ||--o| shipment : "order_id"
+  shipment ||--|{ shipment_event : "shipment_id"
+  category ||--o{ book : "category_id"
+  publisher ||--o{ book : "publisher_id"
+  book ||--|{ book_author : "book_id"
+  author ||--o{ book_author : "author_id"
+  curated_catalog ||--o{ curated_catalog_book : "catalog_id"
+  book ||--o{ curated_catalog_book : "book_id"
+  app_user {
+    bigint id PK
+    varchar email UK
+  }
+  address {
+    bigint id PK
+    bigint user_id FK
+  }
+  cart {
+    bigint id PK
+    bigint user_id "FK, UK"
+  }
+  cart_item {
+    bigint id PK
+    bigint cart_id FK
+    bigint book_id FK
+  }
+  purchase_order {
+    bigint id PK
+    varchar code UK
+    bigint user_id FK
+  }
+  order_item {
+    bigint id PK
+    bigint order_id FK
+    bigint book_id FK
+  }
+  payment {
+    bigint id PK
+    bigint order_id FK
+    varchar gateway_reference UK
+    varchar idempotency_key UK
+  }
+  shipment {
+    bigint id PK
+    bigint order_id "FK, UK"
+  }
+  shipment_event {
+    bigint id PK
+    bigint shipment_id FK
+  }
+  book {
+    bigint id PK
+    varchar isbn UK
+    varchar slug UK
+    bigint category_id FK
+    bigint publisher_id FK
+  }
+  book_author {
+    bigint book_id "PK, FK"
+    bigint author_id FK
+    int author_order PK
+  }
+  curated_catalog_book {
+    bigint catalog_id "PK, FK"
+    bigint book_id FK
+    int item_position PK
+  }
+  category {
+    bigint id PK
+    varchar name UK
+    varchar slug UK
+  }
+  publisher {
+    bigint id PK
+    varchar name UK
+    varchar slug UK
+  }
+  author {
+    bigint id PK
+    varchar slug UK
+  }
+  curated_catalog {
+    bigint id PK
+    varchar slug UK
+  }
+  coupon {
+    bigint id PK
+    varchar code UK
+  }
+  shipping_method {
+    bigint id PK
+    varchar code UK
+  }

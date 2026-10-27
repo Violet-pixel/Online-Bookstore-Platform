@@ -71,7 +71,7 @@ function CopyField({ value }) {
 
 function Success({ payment, onDone }) {
   const pieces = useMemo(() => Array.from({ length: 26 }, (_, i) => ({
-    left: `${(i * 37) % 100}%`, delay: `${(i % 7) * 60}ms`, bg: ['#0A84B8', '#C8236A', '#F2C230', '#1B1B1D'][i % 4], rot: (i * 47) % 180,
+    left: `${(i * 37) % 100}%`, delay: `${(i % 7) * 60}ms`, bg: ['#B86B84', '#E0B94F', '#8E3B59', '#4E6178'][i % 4], rot: (i * 47) % 180,
   })), []);
   return (
     <div className="stack" style={{ alignItems: 'center', textAlign: 'center', gap: 14, position: 'relative', padding: '10px 0' }}>
@@ -117,7 +117,7 @@ export default function PaymentModal({ order, open, onClose, onChange }) {
 
   const pix = pending.PIX;
   useEffect(() => {
-    if (pix?.pixPayload) QRCode.toDataURL(pix.pixPayload, { margin: 0, width: 360, color: { dark: '#1B1B1D', light: '#FFFFFF' } }).then(setQr);
+    if (pix?.pixPayload) QRCode.toDataURL(pix.pixPayload, { margin: 0, width: 360, color: { dark: '#211F22', light: '#FFFFFF' } }).then(setQr);
     else setQr(null);
   }, [pix?.pixPayload]);
 
